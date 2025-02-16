@@ -1,9 +1,11 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+import AccessToken from '#models/access_token'
+import type { HasMany } from '@adonisjs/lucid/orm'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -31,6 +33,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @column.dateTime()
   declare deletedAt: DateTime | null
+
+  @hasMany(() => AccessToken)
+  declare accessTokens: HasMany<typeof AccessToken>
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 }

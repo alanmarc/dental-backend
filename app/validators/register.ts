@@ -14,13 +14,3 @@ export const registerValidator = vine.compile(
     password: vine.string().minLength(8),
   })
 )
-
-// Mensajes personalizados (opcional)
-registerValidator.messages = {
-  'fullName.required': 'El nombre completo es obligatorio',
-  'email.required': 'El correo es obligatorio',
-  'email.email': 'El correo no es válido',
-  'email.unique': 'El correo ya está en uso',
-  'password.required': 'La contraseña es obligatoria',
-  'password.minLength': 'La contraseña debe tener al menos 8 caracteres',
-}
