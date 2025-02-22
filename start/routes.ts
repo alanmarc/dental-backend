@@ -12,6 +12,7 @@ import router from '@adonisjs/core/services/router'
 import users from '../routes/users.js'
 import { middleware } from './kernel.js'
 import patients from '../routes/patients.js'
+import appointments from '../routes/appointments.js'
 
 const { default: AllTokensController } = await import('#controllers/all_tokens_controller')
 
@@ -24,9 +25,14 @@ router
   .prefix('api')
   .as('api')
 
-router.post('/login', [AuthController, 'login']).prefix('api').as('auth.login')
+router
+  .group(() => {
+    router.post('/login', [AuthController, 'login']).as('auth.login')
 
-router.get('/tokens', [AllTokensController]).prefix('api').as('tokens.index').use(middleware.auth())
-
-router.group(users).prefix('api').as('api.users')
-router.group(patients).prefix('api').as('api.patients')
+    router.get('/tokens', [AllTokensController]).as('tokens.index').use(middleware.auth())
+    router.group(users).as('api.users')
+    router.group(patients).as('api.patients')
+    router.group(appointments).as('api.appointments')
+  })
+  .prefix('api')
+  .as('api')
