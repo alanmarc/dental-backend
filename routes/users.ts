@@ -1,24 +1,14 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 
+const { default: GetUsersController } = await import('#controllers/user/get_users_controller')
+const { default: StoreUserController } = await import('#controllers/user/store_user_controller')
+
 const users = (): void => {
   router
     .group(() => {
-      router
-        .post('/', async (ctx) => {
-          const { default: StoreUserController } = await import(
-            '#controllers/store_user_controller'
-          )
-          return new StoreUserController().handle(ctx)
-        })
-        .as('users.store')
-
-      router
-        .get('/', async (ctx) => {
-          const { default: GetUsersController } = await import('#controllers/get_users_controller')
-          return new GetUsersController().index(ctx) // Pasar ctx completo
-        })
-        .as('users.index')
+      router.post('/', [StoreUserController]).as('users.store')
+      router.get('/', [GetUsersController]).as('users.index')
     })
     .prefix('/users')
     .use(middleware.auth())

@@ -6,6 +6,7 @@ import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import AccessToken from '#models/access_token'
 import type { HasMany } from '@adonisjs/lucid/orm'
+import Patient from './patient.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -34,8 +35,13 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime()
   declare deletedAt: DateTime | null
 
+  //Relacion con el token -- TODO: REvisar que sea un acceso por usuario
   @hasMany(() => AccessToken)
   declare accessTokens: HasMany<typeof AccessToken>
+
+  // Relación de un usuario (dentista/encargado) con múltiples pacientes
+  @hasMany(() => Patient)
+  declare patients: HasMany<typeof Patient>
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 }

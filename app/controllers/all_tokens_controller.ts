@@ -2,7 +2,7 @@ import AuthAccessToken from '#models/access_token'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class AllTokensController {
-  public async index({ response }: HttpContext) {
+  public async handle({ response }: HttpContext) {
     try {
       // console.log(auth.authenticateUsing)
       console.log('pasa controller')
