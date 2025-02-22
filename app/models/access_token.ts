@@ -1,27 +1,40 @@
-// import { DateTime } from 'luxon'
-// import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
-// import User from '#models/user'
-// import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { DateTime } from 'luxon'
+import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
+import User from '#models/user'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
-// export default class AccessToken extends BaseModel {
-//   @column({ isPrimary: true })
-//   declare id: number
+export default class AuthAccessToken extends BaseModel {
+  @column({ isPrimary: true })
+  declare id: number
 
-//   @column()
-//   declare userId: number
+  @column({ columnName: 'tokenable_id' }) // 🔹 Asegurar que la columna coincida con la BD
+  declare tokenableId: number
 
-//   @column()
-//   declare token: string
+  @column()
+  declare type: string
 
-//   @column.dateTime()
-//   declare expiresAt: DateTime | null
+  @column()
+  declare name: string | null
 
-//   @column.dateTime({ autoCreate: true })
-//   declare createdAt: DateTime
+  @column()
+  declare hash: string
 
-//   @column.dateTime({ autoCreate: true, autoUpdate: true })
-//   declare updatedAt: DateTime
+  @column()
+  declare abilities: string
 
-//   @belongsTo(() => User)
-//   declare user: BelongsTo<typeof User>
-// }
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+
+  @column.dateTime()
+  declare lastUsedAt: DateTime | null
+
+  @column.dateTime()
+  declare expiresAt: DateTime | null
+
+  // 🔹 Corrección en el tipo de belongsTo
+  @belongsTo(() => User, { foreignKey: 'tokenableId' })
+  declare user: BelongsTo<typeof User> // ✅ Tipo corregido
+}

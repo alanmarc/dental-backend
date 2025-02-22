@@ -8,7 +8,7 @@ export default class GetUsersController {
       const users = await User.all()
       return response.ok(users)
     } catch (error) {
-      return response.badRequest({ message: 'Error al registrar el usuario', error: error.message })
+      return response.badRequest({ message: 'Error al ver los usuarios', error: error.message })
     }
   }
 }
