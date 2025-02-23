@@ -10,6 +10,13 @@ const { default: StorePatientsController } = await import(
 const { default: UpdatePatientsController } = await import(
   '#controllers/patient/update_patients_controller'
 )
+const { default: SoftDeletePatientsController } = await import(
+  '#controllers/patient/soft_delete_patients_controller'
+)
+
+const { default: RestorePatientsController } = await import(
+  '#controllers/patient/restore_patients_controller'
+)
 
 const patients = (): void => {
   router
@@ -17,6 +24,8 @@ const patients = (): void => {
       router.post('/', [StorePatientsController]).as('patients.store')
       router.get('/', [IndexPatientsController]).as('patients.index')
       router.put('/:id', [UpdatePatientsController]).as('patients.update')
+      router.delete('/:id', [SoftDeletePatientsController]).as('patients.delete')
+      router.put('/:id/restore', [RestorePatientsController]).as('patients.restore')
     })
     .prefix('/patients')
     .use(middleware.auth())

@@ -28,6 +28,9 @@ export default class Patient extends BaseModel {
   @column()
   declare note: string | null
 
+  @column.dateTime()
+  declare deletedAt: DateTime | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
