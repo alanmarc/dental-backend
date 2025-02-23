@@ -15,7 +15,6 @@ import patients from '../routes/patients.js'
 import appointments from '../routes/appointments.js'
 
 const { default: AllTokensController } = await import('#controllers/all_tokens_controller')
-
 const { default: AuthController } = await import('#controllers/auth_controller')
 
 router

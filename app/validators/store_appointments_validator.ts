@@ -7,11 +7,11 @@ export const storeAppointmentsValidator = vine.compile(
     patientId: vine.number(),
     userId: vine.number(),
     dateTime: vine.string().transform((value) => {
-      const dt = DateTime.fromISO(value) // Convierte el string en DateTime
+      const dt = DateTime.fromISO(value)
       if (!dt.isValid) {
         throw new Error('Invalid date format')
       }
-      return dt.toUTC() // Convertimos a UTC y lo devolvemos como un objeto DateTime
+      return dt.toUTC()
     }),
     duration: vine.number(),
     status: vine.enum(StatusAppintment),

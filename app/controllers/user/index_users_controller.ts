@@ -1,8 +1,7 @@
-// app/controllers/user_controller.ts
 import User from '#models/user'
 import { HttpContext } from '@adonisjs/core/http'
 
-export default class GetUsersController {
+export default class IndexUsersController {
   public async handle({ response }: HttpContext) {
     try {
       const users = await User.all()
