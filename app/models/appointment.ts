@@ -27,7 +27,10 @@ export default class Appointment extends BaseModel {
   declare reason: string
 
   @column()
-  public notes?: string
+  public notes?: string | null
+
+  @column.dateTime()
+  declare deletedAt: DateTime | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

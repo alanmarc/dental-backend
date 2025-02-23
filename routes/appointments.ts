@@ -10,6 +10,12 @@ const { default: StoreAppointmentsController } = await import(
 const { default: UpdateAppointmentsController } = await import(
   '#controllers/appointment/update_appointments_controller'
 )
+const { default: SoftDeleteAppointmentsController } = await import(
+  '#controllers/appointment/soft_delete_appointments_controller'
+)
+const { default: RestoreAppointmentsController } = await import(
+  '#controllers/appointment/restore_appointments_controller'
+)
 
 const appointments = (): void => {
   router
@@ -17,6 +23,8 @@ const appointments = (): void => {
       router.post('/', [StoreAppointmentsController]).as('appointments.store')
       router.get('/', [IndexAppointmentsController]).as('appointments.index')
       router.put('/:id', [UpdateAppointmentsController]).as('appointments.update')
+      router.delete('/:id', [SoftDeleteAppointmentsController]).as('appointments.delete')
+      router.put('/:id/restore', [RestoreAppointmentsController]).as('appointments.restore')
     })
     .prefix('/appointments')
     .use(middleware.auth())
