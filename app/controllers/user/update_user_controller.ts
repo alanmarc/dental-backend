@@ -1,11 +1,9 @@
 import User from '#models/user'
 import { updateUserValidator } from '#validators/update_user_validator'
 import type { HttpContext } from '@adonisjs/core/http'
-import hash from '@adonisjs/core/services/hash'
 
-export default class UpdateUsersController {
+export default class UpdateUserController {
   public async handle({ params, request, response }: HttpContext) {
-    // Validar los datos de entrada
     const { fullName, email } = await request.validateUsing(updateUserValidator)
 
     try {
