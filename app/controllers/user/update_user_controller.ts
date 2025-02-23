@@ -4,17 +4,12 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 export default class UpdateUserController {
   public async handle({ params, request, response }: HttpContext) {
-    const { fullName, email } = await request.validateUsing(updateUserValidator)
-
     try {
+      const data = await request.validateUsing(updateUserValidator)
+
       const user = await User.findOrFail(params.id)
 
-      if (fullName) {
-        user.fullName = fullName
-      }
-      if (email) {
-        user.email = email
-      }
+      user.merge(data)
 
       await user.save()
 

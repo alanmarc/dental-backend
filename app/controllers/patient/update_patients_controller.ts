@@ -4,36 +4,12 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 export default class UpdatePatientsController {
   public async handle({ params, request, response }: HttpContext) {
-    const { firstName, lastName, email, dob, phone, address, note, userId } =
-      await request.validateUsing(updatePatientValidator)
-
     try {
+      const data = await request.validateUsing(updatePatientValidator)
+
       const patient = await Patient.findOrFail(params.id)
 
-      if (firstName) {
-        patient.firstName = firstName
-      }
-      if (lastName) {
-        patient.lastName = lastName
-      }
-      if (email) {
-        patient.email = email
-      }
-      if (dob) {
-        patient.dob = dob
-      }
-      if (phone) {
-        patient.phone = phone
-      }
-      if (address) {
-        patient.address = address
-      }
-      if (note) {
-        patient.note = note
-      }
-      if (userId) {
-        patient.userId = userId
-      }
+      patient.merge(data)
 
       await patient.save()
 
