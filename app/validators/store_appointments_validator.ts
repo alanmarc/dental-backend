@@ -8,6 +8,10 @@ export const storeAppointmentsValidator = vine.compile(
       const user = await db.from('users').where('id', value).first()
       return !!user
     }),
+    patientId: vine.number().exists(async (db, value) => {
+      const patient = await db.from('patients').where('id', value).first()
+      return !!patient
+    }),
     dateTime: vine.string().transform((value) => {
       const dt = DateTime.fromISO(value)
       if (!dt.isValid) {

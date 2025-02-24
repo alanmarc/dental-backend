@@ -1,14 +1,14 @@
 import Appointment from '#models/appointment'
 import { storeAppointmentsValidator } from '#validators/store_appointments_validator'
 import type { HttpContext } from '@adonisjs/core/http'
+import ApiResponse from '../../utils/api_response.js'
+import { errors } from '@vinejs/vine'
 
 export default class StoreAppointmentsController {
-  public async handle({ request, response }: HttpContext) {
-    const { patientId, userId, dateTime, duration, status, reason } = await request.validateUsing(
-      storeAppointmentsValidator
-    )
-
+  public async handle(ctx: HttpContext) {
     try {
+      const { patientId, userId, dateTime, duration, status, reason } =
+        await ctx.request.validateUsing(storeAppointmentsValidator)
       const appointment = await Appointment.create({
         patientId,
         userId,
@@ -17,12 +17,18 @@ export default class StoreAppointmentsController {
         status,
         reason,
       })
-      return response.created(appointment)
+
+      return ApiResponse.success(ctx, appointment.toJSON().data, 'Cita registrada', 201)
     } catch (error) {
-      return response.badRequest({
-        message: 'Error al registrar la cita',
-        error: error.message,
-      })
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        const formattedErrors = error.messages.map((err) => ({
+          field: err.field,
+          message: err.message,
+        }))
+
+        return ApiResponse.error(ctx, 'Error de validación', 422, { errors: formattedErrors })
+      }
+      return ApiResponse.error(ctx, 'Error al registrar la cita', 500, error.message)
     }
   }
 }

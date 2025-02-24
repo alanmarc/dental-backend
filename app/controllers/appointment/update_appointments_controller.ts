@@ -1,34 +1,31 @@
 import Appointment from '#models/appointment'
 import { updateAppointmentValidator } from '#validators/update_appointment_validator'
 import type { HttpContext } from '@adonisjs/core/http'
+import ApiResponse from '../../utils/api_response.js'
+import { errors } from '@vinejs/vine'
 
 export default class UpdateAppointmentsController {
-  public async handle({ params, request, response }: HttpContext) {
+  public async handle(ctx: HttpContext) {
     try {
-      const data = await request.validateUsing(updateAppointmentValidator)
+      const data = await ctx.request.validateUsing(updateAppointmentValidator)
 
-      const appointment = await Appointment.findOrFail(params.id)
+      const appointment = await Appointment.findOrFail(ctx.params.id)
 
       appointment.merge(data)
 
       await appointment.save()
 
-      return response.ok({
-        message: 'Cita actualizada correctamente',
-        data: appointment,
-      })
+      return ApiResponse.success(ctx, appointment.toJSON().data, 'Cita actualizada')
     } catch (error) {
-      if (error.messages) {
-        return response.badRequest({
-          message: 'Error de validación',
-          errors: error.messages,
-        })
-      }
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        const formattedErrors = error.messages.map((err) => ({
+          field: err.field,
+          message: err.message,
+        }))
 
-      return response.badRequest({
-        message: 'Error al actualizar la cita',
-        error: error.message,
-      })
+        return ApiResponse.error(ctx, 'Error de validación', 422, { errors: formattedErrors })
+      }
+      return ApiResponse.error(ctx, 'Error al editar la cita', 500, error.message)
     }
   }
 }

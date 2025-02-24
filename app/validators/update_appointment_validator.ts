@@ -18,7 +18,6 @@ export const updateAppointmentValidator = vine.compile(
         return !!user
       })
       .optional(),
-
     dateTime: vine
       .string()
       .transform((value) => {
