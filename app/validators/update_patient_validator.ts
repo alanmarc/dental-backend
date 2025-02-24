@@ -7,7 +7,7 @@ export const updatePatientValidator = vine.compile(
       .number()
       .exists(async (db, value) => {
         const user = await db.from('users').where('id', value).first()
-        return !!user // Devuelve true si el usuario existe, false si no
+        return !!user
       })
       .optional(),
     firstName: vine.string().trim().optional(),
