@@ -2,33 +2,25 @@ import User from '#models/user'
 import { HttpContext } from '@adonisjs/core/http'
 import { loginValidator } from '#validators/login'
 import hash from '@adonisjs/core/services/hash'
+import ApiResponse from '../utils/api_response.js'
 
 export default class AuthController {
-  public async login({ request, response, auth }: HttpContext) {
-    const { email, password } = await request.validateUsing(loginValidator)
+  public async login(ctx: HttpContext) {
+    const { email, password } = await ctx.request.validateUsing(loginValidator)
     try {
       const user = await User.findBy('email', email)
-      console.log(user?.$attributes)
 
       if (!user || !user.password || !(await hash.verify(user.password, password))) {
-        return response.unauthorized({ message: 'Credenciales inválidas' })
+        return ApiResponse.error(ctx, 'Credenciales inválidas', 401)
       }
 
-      // Generar un token de acceso
-      const token = await auth
+      const token = await ctx.auth
         .use('api')
         .authenticateAsClient(user, ['Client'], { expiresIn: 20000 })
 
-      // Devolver el token JWT
-      return response.ok({
-        message: 'Login exitoso',
-        token: token,
-      })
+      return ApiResponse.success(ctx, token, 'Accesso exitoso')
     } catch (error) {
-      return response.unauthorized({
-        message: 'Error al iniciar sesión',
-        error: error.message,
-      })
+      return ApiResponse.error(ctx, 'Error al iniciar sesion', 401, error.message)
     }
   }
 }
