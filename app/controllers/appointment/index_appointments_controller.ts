@@ -1,12 +1,17 @@
 import Appointment from '#models/appointment'
 import type { HttpContext } from '@adonisjs/core/http'
 import ApiResponse from '../../utils/api_response.js'
+import AppointmentPolicy from '#policies/appointment_policy'
 
 export default class IndexAppointmentsController {
   public async handle(ctx: HttpContext) {
     try {
       const page = ctx.request.input('page', 1)
       const limit = ctx.request.input('limit', 10)
+
+      await ctx.auth.user?.preload('role')
+      console.log('Usuario autenticado en appointments:', ctx.auth.user?.toJSON()) // 🔍
+      await ctx.bouncer.with(AppointmentPolicy).authorize('view')
 
       const appointments = await Appointment.query().paginate(page, limit)
 
