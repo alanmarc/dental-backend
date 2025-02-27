@@ -9,7 +9,7 @@ export default class AuthController {
     const { email, password } = await ctx.request.validateUsing(loginValidator)
     try {
       const user = await User.query().where('email', email).preload('role').first()
-      console.log('Usuario autenticado:', user?.toJSON())
+      // console.log('Usuario autenticado:', user?.toJSON())
 
       if (!user || !user.password || !(await hash.verify(user.password, password))) {
         return ApiResponse.error(ctx, 'Credenciales inválidas', 401)

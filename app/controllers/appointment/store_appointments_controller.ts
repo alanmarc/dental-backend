@@ -3,12 +3,17 @@ import { storeAppointmentsValidator } from '#validators/store_appointments_valid
 import type { HttpContext } from '@adonisjs/core/http'
 import ApiResponse from '../../utils/api_response.js'
 import { errors } from '@vinejs/vine'
+import AppointmentPolicy from '#policies/appointment_policy'
 
 export default class StoreAppointmentsController {
   public async handle(ctx: HttpContext) {
     try {
       const { patientId, userId, dateTime, duration, status, reason } =
         await ctx.request.validateUsing(storeAppointmentsValidator)
+
+      await ctx.auth.user?.load('role')
+      await ctx.bouncer.with(AppointmentPolicy).authorize('create')
+
       const appointment = await Appointment.create({
         patientId,
         userId,

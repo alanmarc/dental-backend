@@ -12,5 +12,12 @@ export const updateUserValidator = vine.compile(
         return !user
       })
       .optional(),
+    roleId: vine
+      .number()
+      .exists(async (db, value) => {
+        const role = await db.from('roles').where('id', value).first()
+        return !!role
+      })
+      .optional(),
   })
 )

@@ -9,8 +9,7 @@ export default class IndexAppointmentsController {
       const page = ctx.request.input('page', 1)
       const limit = ctx.request.input('limit', 10)
 
-      await ctx.auth.user?.preload('role')
-      console.log('Usuario autenticado en appointments:', ctx.auth.user?.toJSON()) // 🔍
+      await ctx.auth.user?.load('role')
       await ctx.bouncer.with(AppointmentPolicy).authorize('view')
 
       const appointments = await Appointment.query().paginate(page, limit)
