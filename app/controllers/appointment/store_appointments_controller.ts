@@ -1,5 +1,5 @@
 import Appointment from '#models/appointment'
-import { storeAppointmentsValidator } from '#validators/store_appointments_validator'
+import { storeAppointmentsValidator } from '#validators/appointment/store_appointments_validator'
 import type { HttpContext } from '@adonisjs/core/http'
 import ApiResponse from '../../utils/api_response.js'
 import AppointmentPolicy from '#policies/appointment_policy'

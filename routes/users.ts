@@ -14,11 +14,11 @@ const { default: RestoreUsersController } = await import(
 const users = (): void => {
   router
     .group(() => {
-      router.post('/', [StoreUserController]).as('users.store')
-      router.get('/', [IndexUsersController]).as('users.index')
-      router.put('/:id', [UpdateUserController]).as('users.update')
-      router.delete('/:id', [SoftDeleteUsersController]).as('users.delete')
-      router.put('/:id/restore', [RestoreUsersController]).as('users.restore')
+      router.post('/', [StoreUserController]).as('store')
+      router.get('/', [IndexUsersController]).as('index')
+      router.put('/:id', [UpdateUserController]).as('update')
+      router.delete('/:id', [SoftDeleteUsersController]).as('delete')
+      router.put('/:id/restore', [RestoreUsersController]).as('restore')
     })
     .prefix('/users')
     .use(middleware.auth())

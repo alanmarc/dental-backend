@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import { StatusAppintment } from '../enums/status_appointement.js'
+import { StatusAppointment } from '../../enums/status_appointement.js'
 import { DateTime } from 'luxon'
 
 export const storeAppointmentsValidator = vine.compile(
@@ -20,7 +20,7 @@ export const storeAppointmentsValidator = vine.compile(
       return dt.toUTC()
     }),
     duration: vine.number(),
-    status: vine.enum(StatusAppintment),
+    status: vine.enum(StatusAppointment),
     reason: vine.string(),
   })
 )

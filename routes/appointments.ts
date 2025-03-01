@@ -20,11 +20,11 @@ const { default: RestoreAppointmentsController } = await import(
 const appointments = (): void => {
   router
     .group(() => {
-      router.post('/', [StoreAppointmentsController]).as('appointments.store')
-      router.get('/', [IndexAppointmentsController]).as('appointments.index')
-      router.put('/:id', [UpdateAppointmentsController]).as('appointments.update')
-      router.delete('/:id', [SoftDeleteAppointmentsController]).as('appointments.delete')
-      router.put('/:id/restore', [RestoreAppointmentsController]).as('appointments.restore')
+      router.post('/', [StoreAppointmentsController]).as('store')
+      router.get('/', [IndexAppointmentsController]).as('index')
+      router.put('/:id', [UpdateAppointmentsController]).as('update')
+      router.delete('/:id', [SoftDeleteAppointmentsController]).as('delete')
+      router.put('/:id/restore', [RestoreAppointmentsController]).as('restore')
     })
     .prefix('/appointments')
     .use(middleware.auth())

@@ -1,5 +1,5 @@
 import Patient from '#models/patient'
-import { storePatientValidator } from '#validators/store_patient_validator'
+import { storePatientValidator } from '#validators/patient/store_patient_validator'
 import type { HttpContext } from '@adonisjs/core/http'
 import ApiResponse from '../../utils/api_response.js'
 import PatientPolicy from '#policies/patient_policy'

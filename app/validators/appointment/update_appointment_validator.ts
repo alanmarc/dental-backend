@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 import { DateTime } from 'luxon'
-import { StatusAppintment } from '../enums/status_appointement.js'
+import { StatusAppointment } from '../../enums/status_appointement.js'
 
 export const updateAppointmentValidator = vine.compile(
   vine.object({
@@ -29,7 +29,7 @@ export const updateAppointmentValidator = vine.compile(
       })
       .optional(),
     duration: vine.number().optional(),
-    status: vine.enum(StatusAppintment).optional(),
+    status: vine.enum(StatusAppointment).optional(),
     reason: vine.string().trim().optional(),
     note: vine.string().trim().optional(),
   })

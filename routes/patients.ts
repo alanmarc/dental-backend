@@ -21,11 +21,11 @@ const { default: RestorePatientsController } = await import(
 const patients = (): void => {
   router
     .group(() => {
-      router.post('/', [StorePatientsController]).as('patients.store')
-      router.get('/', [IndexPatientsController]).as('patients.index')
-      router.put('/:id', [UpdatePatientsController]).as('patients.update')
-      router.delete('/:id', [SoftDeletePatientsController]).as('patients.delete')
-      router.put('/:id/restore', [RestorePatientsController]).as('patients.restore')
+      router.post('/', [StorePatientsController]).as('store')
+      router.get('/', [IndexPatientsController]).as('index')
+      router.put('/:id', [UpdatePatientsController]).as('update')
+      router.delete('/:id', [SoftDeletePatientsController]).as('delete')
+      router.put('/:id/restore', [RestorePatientsController]).as('restore')
     })
     .prefix('/patients')
     .use(middleware.auth())
