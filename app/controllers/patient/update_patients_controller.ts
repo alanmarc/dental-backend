@@ -18,7 +18,7 @@ export default class UpdatePatientsController {
       return ApiResponse.success(ctx, patient.toJSON().data, 'Paciente actualizado')
     } catch (error) {
       if (error instanceof errors.E_VALIDATION_ERROR) {
-        const formattedErrors = error.messages.map((err) => ({
+        const formattedErrors = error.messages.map((err: { field: string; message: string }) => ({
           field: err.field,
           message: err.message,
         }))
