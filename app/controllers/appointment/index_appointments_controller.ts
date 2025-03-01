@@ -2,7 +2,7 @@ import Appointment from '#models/appointment'
 import type { HttpContext } from '@adonisjs/core/http'
 import ApiResponse from '../../utils/api_response.js'
 import AppointmentPolicy from '#policies/appointment_policy'
-import { errors } from '@adonisjs/bouncer'
+import { handleControllerError } from '../../utils/error_handler.js'
 
 export default class IndexAppointmentsController {
   public async handle(ctx: HttpContext) {
@@ -22,10 +22,7 @@ export default class IndexAppointmentsController {
         'Citas encontradas'
       )
     } catch (error) {
-      if (error instanceof errors.E_AUTHORIZATION_FAILURE) {
-        return ApiResponse.error(ctx, 'No tienes los permisos necesarios', 403, error.message)
-      }
-      return ApiResponse.error(ctx, 'Error al obtener las citas', 500, error.message)
+      return handleControllerError(ctx, error)
     }
   }
 }
