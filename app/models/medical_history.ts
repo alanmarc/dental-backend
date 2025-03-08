@@ -5,7 +5,7 @@ import User from '#models/user'
 import Patient from '#models/patient'
 import Appointment from '#models/appointment'
 
-export default class MedicalHistories extends BaseModel {
+export default class MedicalHistory extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 

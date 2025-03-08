@@ -1,8 +1,8 @@
-import MedicalHistories from '#models/medical_histories'
 import MedicalHistoriePolicy from '#policies/medical_historie_policy'
 import type { HttpContext } from '@adonisjs/core/http'
 import ApiResponse from '../../utils/api_response.js'
 import { handleControllerError } from '../../utils/error_handler.js'
+import MedicalHistory from '#models/medical_history'
 
 export default class IndexMedicalHistoriesController {
   public async handle(ctx: HttpContext) {
@@ -13,12 +13,12 @@ export default class IndexMedicalHistoriesController {
       const page = ctx.request.input('page', 1)
       const limit = ctx.request.input('limit', 10)
 
-      const medicalHistorie = await MedicalHistories.query().paginate(page, limit)
+      const medicalHistories = await MedicalHistory.query().paginate(page, limit)
 
       return ApiResponse.paginate(
         ctx,
-        medicalHistorie.toJSON().data,
-        medicalHistorie.toJSON().meta,
+        medicalHistories.toJSON().data,
+        medicalHistories.toJSON().meta,
         'Historial encontrado'
       )
     } catch (error) {

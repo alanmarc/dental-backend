@@ -13,7 +13,7 @@ import users from '../routes/users.js'
 import { middleware } from './kernel.js'
 import patients from '../routes/patients.js'
 import appointments from '../routes/appointments.js'
-import medicalHistory from '../routes/medical_history.js'
+import medicalHistories from '../routes/medical_histories.js'
 
 const { default: AllTokensController } = await import('#controllers/all_tokens_controller')
 const { default: AuthController } = await import('#controllers/auth_controller')
@@ -33,7 +33,7 @@ router
     router.group(users).as('users')
     router.group(patients).as('patients')
     router.group(appointments).as('appointments')
-    router.group(medicalHistory).as('medical_history')
+    router.group(medicalHistories).as('medical_histories')
   })
   .prefix('api')
   .as('api')

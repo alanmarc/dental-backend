@@ -1,4 +1,4 @@
-import MedicalHistories from '#models/medical_histories'
+import MedicalHistory from '#models/medical_history'
 import type { HttpContext } from '@adonisjs/core/http'
 import MedicalHistoriePolicy from '#policies/medical_historie_policy'
 import { updateMedicalHistoriesValidator } from '#validators/medical_historie/update_medical_histories_validator'
@@ -12,7 +12,7 @@ export default class UpdateMedicalHistoriesController {
       await ctx.auth.user?.load('role')
       await ctx.bouncer.with(MedicalHistoriePolicy).authorize('update')
 
-      const medicalHistorie = await MedicalHistories.findOrFail(ctx.params.id)
+      const medicalHistorie = await MedicalHistory.findOrFail(ctx.params.id)
 
       const data = await ctx.request.validateUsing(updateMedicalHistoriesValidator)
       handlerEmptyRequest(data)
