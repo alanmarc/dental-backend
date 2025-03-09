@@ -8,6 +8,7 @@ import AccessToken from '#models/access_token'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Patient from './patient.js'
 import Role from './role.js'
+import Branch from './branch.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -39,16 +40,24 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare roleId: number | null
 
+  @column()
+  declare branchId: number | null
+
   //Relacion con el token -- TODO: REvisar que sea un acceso por usuario
   @hasMany(() => AccessToken)
   declare accessTokens: HasMany<typeof AccessToken>
 
-  // Relación de un usuario (dentista/encargado) con múltiples pacientes
+  //Un usuario con múltiples pacientes
   @hasMany(() => Patient)
   declare patients: HasMany<typeof Patient>
 
+  //Un usuario tiene un solo rol
   @belongsTo(() => Role)
   declare role: BelongsTo<typeof Role>
+
+  //Un usuario a una sola sucursal
+  @belongsTo(() => Branch)
+  declare branch: BelongsTo<typeof Branch>
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 }

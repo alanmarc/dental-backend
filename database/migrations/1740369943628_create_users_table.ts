@@ -9,6 +9,21 @@ export default class extends BaseSchema {
       table.string('full_name').nullable()
       table.string('email', 254).notNullable().unique()
       table.string('password').notNullable()
+      table.timestamp('deleted_at', { useTz: true }).nullable()
+      table
+        .integer('role_id')
+        .unsigned()
+        .references('id')
+        .inTable('roles')
+        .onDelete('SET NULL')
+        .nullable()
+      table
+        .integer('branch_id')
+        .unsigned()
+        .references('id')
+        .inTable('branches')
+        .onDelete('SET NULL')
+        .nullable()
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()

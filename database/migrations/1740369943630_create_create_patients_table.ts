@@ -20,6 +20,15 @@ export default class CreatePatientsTable extends BaseSchema {
       table.string('phone').nullable()
       table.string('address').nullable()
       table.string('note').nullable()
+      table.timestamp('deleted_at', { useTz: true }).nullable()
+      table
+        .integer('branch_id')
+        .unsigned()
+        .references('id')
+        .inTable('branches')
+        .onDelete('SET NULL')
+        .nullable()
+
       table.timestamp('created_at').defaultTo(this.now())
       table.timestamp('updated_at').nullable()
     })

@@ -29,6 +29,14 @@ export default class extends BaseSchema {
       table.text('diagnosis').nullable()
       table.text('treatment').nullable()
       table.text('notes').nullable()
+      table.timestamp('deleted_at', { useTz: true }).nullable()
+      table
+        .integer('branch_id')
+        .unsigned()
+        .references('id')
+        .inTable('branches')
+        .onDelete('SET NULL')
+        .nullable()
       table.timestamps(true, true)
     })
   }
