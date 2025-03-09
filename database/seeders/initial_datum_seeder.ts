@@ -3,14 +3,15 @@ import Branch from '#models/branch'
 import User from '#models/user'
 import Patient from '#models/patient'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
-import Hash from '@adonisjs/core/services/hash'
 import { DateTime } from 'luxon'
 
 export default class InitialDataSeeder extends BaseSeeder {
   public async run() {
     // Verificar si ya existen hospitales
     const existingHospitals = await Hospital.query().count('* as total')
-    if (existingHospitals[0].total > 0) {
+    const totalHospitals = existingHospitals[0]?.$extras.total ?? 0
+
+    if (totalHospitals > 0) {
       console.log('Los hospitales ya están registrados. Seeder omitido.')
       return
     }
@@ -38,7 +39,7 @@ export default class InitialDataSeeder extends BaseSeeder {
       branchId: branch.id,
     })
 
-    const drUser = await User.create({
+    await User.create({
       fullName: 'Dr Tilin',
       email: 'dr-tilin@example.com',
       password: 'password',
@@ -46,7 +47,7 @@ export default class InitialDataSeeder extends BaseSeeder {
       branchId: branch.id,
     })
 
-    const assistantUser = await User.create({
+    await User.create({
       fullName: 'Señorito Tilin',
       email: 'tilin@example.com',
       password: 'password',
