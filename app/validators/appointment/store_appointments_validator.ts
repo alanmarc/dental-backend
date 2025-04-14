@@ -12,6 +12,10 @@ export const storeAppointmentsValidator = vine.compile(
       const patient = await db.from('patients').where('id', value).first()
       return !!patient
     }),
+    branchId: vine.number().exists(async (db, value) => {
+      const branch = await db.from('branches').where('id', value).first()
+      return !!branch
+    }),
     dateTime: vine.string().transform((value) => {
       const dt = DateTime.fromISO(value)
       if (!dt.isValid) {
