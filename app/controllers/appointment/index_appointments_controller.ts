@@ -12,8 +12,20 @@ export default class IndexAppointmentsController {
 
       const page = ctx.request.input('page', 1)
       const limit = ctx.request.input('limit', 10)
+      const status = ctx.request.input('status', undefined)
 
-      const appointments = await Appointment.query().paginate(page, limit)
+      // Inicia la consulta
+      const query = Appointment.query().preload('patient').preload('user').preload('branch')
+
+      // Aplica el filtro si existe
+      if (status) {
+        query.where('status', status)
+        // O usando el scope (ambas formas funcionan):
+        // query.apply(scope => scope.byStatus(status))
+      }
+
+      // Ejecuta la consulta CON los filtros aplicados
+      const appointments = await query.paginate(page, limit)
 
       return ApiResponse.paginate(
         ctx,

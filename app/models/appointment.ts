@@ -62,4 +62,12 @@ export default class Appointment extends BaseModel {
   static byBranch = scope((query, branchId: number) => {
     query.where('branch_id', branchId)
   })
+
+  static byStatus = scope((query, status: 'scheduled' | 'completed' | 'canceled' | 'missed') => {
+    if (status) {
+      // Verificación adicional
+      query.where('status', status.toLowerCase()) // Asegura minúsculas
+    }
+    return query
+  })
 }
