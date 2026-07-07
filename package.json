@@ -12,7 +12,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm lint && pnpm format && pnpm typecheck",
+    "fix": "pnpm lint:fix && pnpm format && pnpm typecheck"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",

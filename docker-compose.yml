@@ -1,0 +1,30 @@
+services:
+  dental-db:
+    image: postgres:17.6
+    container_name: dental-db
+    ports:
+      - '53001:5432'
+    volumes:
+      - postgresdb:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: dental
+
+  dental-test-db:
+    image: postgres:18.3
+    container_name: dental-test-db
+    ports:
+      - '53101:5432'
+    volumes:
+      - postgresdb_test:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: dental-test
+
+volumes:
+  postgresdb:
+    driver: local
+  postgresdb_test:
+    driver: local
