@@ -4,12 +4,10 @@ import router from '@adonisjs/core/services/router'
 const { default: IndexUsersController } = await import('#controllers/user/index_users_controller')
 const { default: StoreUserController } = await import('#controllers/user/store_user_controller')
 const { default: UpdateUserController } = await import('#controllers/user/update_user_controller')
-const { default: SoftDeleteUsersController } = await import(
-  '#controllers/user/soft_delete_users_controller'
-)
-const { default: RestoreUsersController } = await import(
-  '#controllers/user/restore_users_controller'
-)
+const { default: SoftDeleteUsersController } =
+  await import('#controllers/user/soft_delete_users_controller')
+const { default: RestoreUsersController } =
+  await import('#controllers/user/restore_users_controller')
 
 const users = (): void => {
   router
