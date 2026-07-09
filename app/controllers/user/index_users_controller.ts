@@ -10,7 +10,6 @@ export default class IndexUsersController {
       const page = ctx.request.input('page', 1)
       const limit = ctx.request.input('limit', 10)
 
-      await ctx.auth.user?.load('role')
       await ctx.bouncer.with(UserPolicy).authorize('view')
 
       const users = await User.query().paginate(page, limit)

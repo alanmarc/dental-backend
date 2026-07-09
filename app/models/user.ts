@@ -60,4 +60,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare branch: BelongsTo<typeof Branch>
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
+
+  hasPermission(permissionName: string): boolean {
+    if (!this.role || !this.role.permissions) return false
+    return this.role.permissions.some((perm) => perm.name === permissionName)
+  }
 }

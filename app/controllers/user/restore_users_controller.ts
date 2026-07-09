@@ -7,15 +7,14 @@ import { handleControllerError } from '../../utils/error_handler.js'
 export default class RestoreUsersController {
   public async handle(ctx: HttpContext) {
     try {
-      await ctx.auth.user?.load('role')
-      await ctx.bouncer.with(UserPolicy).authorize('delete')
+      const target = await User.findOrFail(ctx.params.id)
 
-      const user = await User.findOrFail(ctx.params.id)
+      await ctx.bouncer.with(UserPolicy).authorize('delete', target)
 
-      user.deletedAt = null
-      await user.save()
+      target.deletedAt = null
+      await target.save()
 
-      return ApiResponse.success(ctx, user.toJSON().data, 'Usuario restaurado')
+      return ApiResponse.success(ctx, target.toJSON().data, 'Usuario restaurado')
     } catch (error) {
       return handleControllerError(ctx, error)
     }

@@ -4,6 +4,7 @@ import User from '#models/user'
 import Patient from '#models/patient'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
+import Role from '#models/role'
 
 export default class InitialDataSeeder extends BaseSeeder {
   public async run() {
@@ -30,20 +31,25 @@ export default class InitialDataSeeder extends BaseSeeder {
       address: 'Av. Principal #123. Puebla, Puebla México',
     })
 
-    // Crear un usuario (admin)
-    const adminUser = await User.create({
+    const [adminRole, doctorRole, assistantRole] = await Promise.all([
+      Role.findByOrFail('name', 'admin'),
+      Role.findByOrFail('name', 'doctor'),
+      Role.findByOrFail('name', 'assistant'),
+    ])
+
+    await User.create({
       fullName: 'El jefe tilin',
       email: 'admin@example.com',
       password: 'password',
-      roleId: 1,
+      roleId: adminRole.id,
       branchId: branch.id,
     })
 
-    await User.create({
+    const doctorUser = await User.create({
       fullName: 'Dr Tilin',
       email: 'dr-tilin@example.com',
       password: 'password',
-      roleId: 2,
+      roleId: doctorRole.id,
       branchId: branch.id,
     })
 
@@ -51,16 +57,15 @@ export default class InitialDataSeeder extends BaseSeeder {
       fullName: 'Señorito Tilin',
       email: 'tilin@example.com',
       password: 'password',
-      roleId: 3,
+      roleId: assistantRole.id,
       branchId: branch.id,
     })
 
-    // Crear un paciente
     await Patient.create({
-      userId: adminUser.id,
-      firstName: 'Juan',
-      lastName: 'Pérez',
-      email: 'juan.perez@example.com',
+      userId: doctorUser.id,
+      firstName: 'Tilin',
+      lastName: 'Marcos',
+      email: 'tilin.marcos@example.com',
       dob: DateTime.fromISO('1990-05-15'),
       phone: '555-6789',
       address: 'Calle Secundaria #456',

@@ -8,17 +8,20 @@ import { handleControllerError } from '../../utils/error_handler.js'
 export default class UpdateUserController {
   public async handle(ctx: HttpContext) {
     try {
-      await ctx.auth.user?.load('role')
-      await ctx.bouncer.with(UserPolicy).authorize('update')
+      const target = await User.findOrFail(ctx.params.id)
+
+      await ctx.bouncer.with(UserPolicy).authorize('update', target)
 
       const data = await ctx.request.validateUsing(updateUserValidator)
-      const user = await User.findOrFail(ctx.params.id)
 
-      user.merge(data)
+      if (data.roleId !== undefined && data.roleId !== target.roleId) {
+        await ctx.bouncer.with(UserPolicy).authorize('assignRole', target)
+      }
 
-      await user.save()
+      target.merge(data)
+      await target.save()
 
-      return ApiResponse.success(ctx, user.toJSON().data, 'Usuario actualizado')
+      return ApiResponse.success(ctx, target.toJSON().data, 'Usuario actualizado')
     } catch (error) {
       return handleControllerError(ctx, error)
     }

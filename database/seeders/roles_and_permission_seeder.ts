@@ -1,63 +1,116 @@
 import Permission from '#models/permission'
 import Role from '#models/role'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
+import { PERMISSIONS } from '../../app/constants/permissions.js'
 
 export default class RolesAndPermissionsSeeder extends BaseSeeder {
   public async run() {
-    // Verificar si los roles ya existen
-    const existingRoles = await Role.all()
+    const roles = await this.upsertRoles(['admin', 'doctor', 'assistant', 'patient'])
+    const permissions = await this.upsertPermissions(this.flattenPermissions())
 
-    const roles = {
-      admin:
-        existingRoles.find((r) => r.name === 'admin') || (await Role.create({ name: 'admin' })),
-      doctor:
-        existingRoles.find((r) => r.name === 'doctor') || (await Role.create({ name: 'doctor' })),
-      assistant:
-        existingRoles.find((r) => r.name === 'assistant') ||
-        (await Role.create({ name: 'assistant' })),
-      patient:
-        existingRoles.find((r) => r.name === 'patient') || (await Role.create({ name: 'patient' })),
+    const permByName = (name: string) => permissions.find((p) => p.name === name)!
+
+    await roles.admin
+      .related('permissions')
+      .sync(
+        this.pivotFor(
+          [
+            PERMISSIONS.users.view,
+            PERMISSIONS.users.create,
+            PERMISSIONS.users.update,
+            PERMISSIONS.users.delete,
+            PERMISSIONS.users.restore,
+            PERMISSIONS.users.assignRole,
+            PERMISSIONS.patients.view,
+            PERMISSIONS.patients.create,
+            PERMISSIONS.patients.update,
+            PERMISSIONS.patients.delete,
+            PERMISSIONS.patients.restore,
+            PERMISSIONS.appointments.view,
+            PERMISSIONS.appointments.create,
+            PERMISSIONS.appointments.update,
+            PERMISSIONS.appointments.cancel,
+            PERMISSIONS.medicalHistories.view,
+            PERMISSIONS.medicalHistories.create,
+            PERMISSIONS.medicalHistories.update,
+          ],
+          permByName
+        )
+      )
+
+    await roles.doctor
+      .related('permissions')
+      .sync(
+        this.pivotFor(
+          [
+            PERMISSIONS.patients.view,
+            PERMISSIONS.patients.create,
+            PERMISSIONS.patients.update,
+            PERMISSIONS.appointments.view,
+            PERMISSIONS.appointments.create,
+            PERMISSIONS.appointments.update,
+            PERMISSIONS.appointments.cancel,
+            PERMISSIONS.medicalHistories.view,
+            PERMISSIONS.medicalHistories.create,
+            PERMISSIONS.medicalHistories.update,
+          ],
+          permByName
+        )
+      )
+
+    await roles.assistant.related('permissions').sync(
+      this.pivotFor(
+        [
+          PERMISSIONS.patients.view,
+          PERMISSIONS.patients.create,
+          PERMISSIONS.appointments.view,
+          PERMISSIONS.appointments.create,
+          PERMISSIONS.appointments.update,
+        ],
+        permByName
+      )
+      // Nota: sin delete/restore de patients, sin assign_role, sin manage_users
+    )
+
+    await roles.patient.related('permissions').sync(
+      this.pivotFor(
+        [
+          PERMISSIONS.appointments.view, // scoping a "sus propias" citas va en la policy, no aquí
+        ],
+        permByName
+      )
+    )
+  }
+
+  private pivotFor(names: string[], resolve: (n: string) => Permission) {
+    return names.reduce(
+      (acc, name) => {
+        acc[resolve(name).id] = {}
+        return acc
+      },
+      {} as Record<number, {}>
+    )
+  }
+
+  private flattenPermissions(): string[] {
+    return Object.values(PERMISSIONS).flatMap((group) => Object.values(group))
+  }
+
+  private async upsertRoles(names: string[]) {
+    const existing = await Role.all()
+    const result: Record<string, Role> = {}
+    for (const name of names) {
+      result[name] = existing.find((r) => r.name === name) ?? (await Role.create({ name }))
     }
+    return result as { admin: Role; doctor: Role; assistant: Role; patient: Role }
+  }
 
-    // Verificar si los permisos ya existen
-    const existingPermissions = await Permission.all()
-
-    const permissions = {
-      manageUsers:
-        existingPermissions.find((p) => p.name === 'manage_users') ||
-        (await Permission.create({ name: 'manage_users' })),
-      manageAppointments:
-        existingPermissions.find((p) => p.name === 'manage_appointments') ||
-        (await Permission.create({ name: 'manage_appointments' })),
-      viewAppointments:
-        existingPermissions.find((p) => p.name === 'view_appointments') ||
-        (await Permission.create({ name: 'view_appointments' })),
-      managePatients:
-        existingPermissions.find((p) => p.name === 'manage_patients') ||
-        (await Permission.create({ name: 'manage_patients' })),
+  private async upsertPermissions(names: string[]) {
+    const existing = await Permission.all()
+    const missing = names.filter((n) => !existing.find((p) => p.name === n))
+    if (missing.length) {
+      await Permission.createMany(missing.map((name) => ({ name })))
     }
-
-    // Asignar permisos a roles sin duplicados
-    await roles.admin.related('permissions').sync({
-      [permissions.manageUsers.id]: {},
-      [permissions.manageAppointments.id]: {},
-      [permissions.viewAppointments.id]: {},
-      [permissions.managePatients.id]: {},
-    })
-
-    await roles.doctor.related('permissions').sync({
-      [permissions.manageAppointments.id]: {},
-      [permissions.viewAppointments.id]: {},
-      [permissions.managePatients.id]: {},
-    })
-
-    await roles.assistant.related('permissions').sync({
-      [permissions.viewAppointments.id]: {},
-      [permissions.managePatients.id]: {},
-    })
-
-    await roles.patient.related('permissions').sync({
-      [permissions.viewAppointments.id]: {},
-    })
+    return Permission.all()
   }
 }

@@ -19,7 +19,7 @@ const users = (): void => {
       router.put('/:id/restore', [RestoreUsersController]).as('restore')
     })
     .prefix('/users')
-    .use(middleware.auth())
+    .use([middleware.auth(), middleware.loadPermissions()])
 }
 
 export default users

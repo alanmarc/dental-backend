@@ -8,7 +8,6 @@ import { handleControllerError } from '../../utils/error_handler.js'
 export default class StoreUserController {
   public async handle(ctx: HttpContext) {
     try {
-      await ctx.auth.user?.load('role')
       await ctx.bouncer.with(UserPolicy).authorize('create')
 
       const { fullName, email, password } = await ctx.request.validateUsing(registerValidator)

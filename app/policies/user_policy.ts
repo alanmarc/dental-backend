@@ -1,20 +1,32 @@
 import User from '#models/user'
 import { BasePolicy } from '@adonisjs/bouncer'
+import { AuthorizerResponse } from '@adonisjs/bouncer/types'
 
 export default class UserPolicy extends BasePolicy {
-  async view(user: User) {
-    return ['admin', 'doctor', 'assistant'].includes(user.role.name)
+  async view(actor: User): Promise<AuthorizerResponse> {
+    return actor.hasPermission('users.view')
   }
 
-  async create(user: User) {
-    return ['admin'].includes(user.role.name)
+  async create(actor: User): Promise<AuthorizerResponse> {
+    return actor.hasPermission('users.create')
   }
 
-  async delete(user: User) {
-    return ['admin'].includes(user.role.name)
+  async update(actor: User, _target: User): Promise<AuthorizerResponse> {
+    return actor.hasPermission('users.update')
   }
 
-  async update(user: User) {
-    return ['admin'].includes(user.role.name)
+  async assignRole(actor: User, target: User): Promise<AuthorizerResponse> {
+    if (!actor.hasPermission('users.assign_role')) return false
+    if (actor.id === target.id) return false
+    return true
+  }
+
+  async delete(actor: User, target: User): Promise<AuthorizerResponse> {
+    if (actor.id === target.id) return false
+    return actor.hasPermission('users.delete')
+  }
+
+  async restore(actor: User): Promise<AuthorizerResponse> {
+    return actor.hasPermission('users.restore')
   }
 }
