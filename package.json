@@ -8,12 +8,15 @@
     "start": "node bin/server.js",
     "build": "node ace build",
     "dev": "node ace serve --hmr",
-    "test": "node ace test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm lint && pnpm format && pnpm typecheck",
+    "test": "node ace test",
+    "test:unit": "pnpm test -- unit",
+    "test:functional": "pnpm test -- functional",
+    "test:watch": "pnpm test -- --watch",
+    "check": "pnpm lint && pnpm typecheck && pnpm test",
     "fix": "pnpm lint:fix && pnpm format && pnpm typecheck"
   },
   "imports": {

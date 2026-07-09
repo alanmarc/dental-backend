@@ -1,6 +1,7 @@
 import { HttpContext } from '@adonisjs/core/http'
 import { errors as errorVine } from '@vinejs/vine'
 import { errors as errorBouncer } from '@adonisjs/bouncer'
+import { errors as errorLucid } from '@adonisjs/lucid'
 import ApiResponse from './api_response.js'
 
 export function handleControllerError(ctx: HttpContext, error: any) {
@@ -15,6 +16,10 @@ export function handleControllerError(ctx: HttpContext, error: any) {
     }))
 
     return ApiResponse.error(ctx, 'Error de validación', 422, { errors: formattedErrors })
+  }
+
+  if (error instanceof errorLucid.E_ROW_NOT_FOUND) {
+    return ApiResponse.error(ctx, 'Recurso no encontrado', 404)
   }
 
   return ApiResponse.error(ctx, 'Error interno del servidor', 500, error.message)

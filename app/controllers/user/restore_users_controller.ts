@@ -14,7 +14,7 @@ export default class RestoreUsersController {
       target.deletedAt = null
       await target.save()
 
-      return ApiResponse.success(ctx, target.toJSON().data, 'Usuario restaurado')
+      return ApiResponse.success(ctx, target.toJSON(), 'Usuario restaurado')
     } catch (error) {
       return handleControllerError(ctx, error)
     }

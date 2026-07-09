@@ -16,7 +16,7 @@ export default class StoreUserController {
         email,
         password,
       })
-      return ApiResponse.success(ctx, user.toJSON().data, 'Usuario registrado', 201)
+      return ApiResponse.success(ctx, user.toJSON(), 'Usuario registrado', 201)
     } catch (error) {
       return handleControllerError(ctx, error)
     }

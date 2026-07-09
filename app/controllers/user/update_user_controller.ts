@@ -21,7 +21,7 @@ export default class UpdateUserController {
       target.merge(data)
       await target.save()
 
-      return ApiResponse.success(ctx, target.toJSON().data, 'Usuario actualizado')
+      return ApiResponse.success(ctx, target.toJSON(), 'Usuario actualizado')
     } catch (error) {
       return handleControllerError(ctx, error)
     }

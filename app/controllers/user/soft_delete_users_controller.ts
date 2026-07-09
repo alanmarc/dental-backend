@@ -15,7 +15,7 @@ export default class SoftDeleteUsersController {
       target.deletedAt = DateTime.utc()
       await target.save()
 
-      return ApiResponse.success(ctx, target.toJSON().data, 'Usuario eliminado (Soft)')
+      return ApiResponse.success(ctx, target.toJSON(), 'Usuario eliminado (Soft)')
     } catch (error) {
       return handleControllerError(ctx, error)
     }
