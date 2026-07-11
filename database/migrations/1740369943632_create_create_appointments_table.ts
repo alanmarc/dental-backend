@@ -12,14 +12,14 @@ export default class extends BaseSchema {
         .notNullable()
         .references('id')
         .inTable('patients')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
       table
         .integer('user_id')
         .unsigned()
         .notNullable()
         .references('id')
         .inTable('users')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
       table.timestamp('date_time', { useTz: true }).notNullable()
       table.integer('duration').notNullable().defaultTo(30)
       table
@@ -35,7 +35,7 @@ export default class extends BaseSchema {
         .notNullable()
         .references('id')
         .inTable('branches')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
       table.timestamps(true, true)
     })
   }

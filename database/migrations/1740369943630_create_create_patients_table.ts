@@ -12,7 +12,7 @@ export default class CreatePatientsTable extends BaseSchema {
         .notNullable()
         .references('id')
         .inTable('users')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
       table.string('first_name').notNullable()
       table.string('last_name').notNullable()
       table.string('email').nullable().unique()
@@ -27,7 +27,7 @@ export default class CreatePatientsTable extends BaseSchema {
         .notNullable()
         .references('id')
         .inTable('branches')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
 
       table.timestamp('created_at').defaultTo(this.now())
       table.timestamp('updated_at').nullable()

@@ -9,9 +9,10 @@ export default class extends BaseSchema {
       table
         .integer('hospital_id')
         .unsigned()
+        .notNullable()
         .references('id')
         .inTable('hospitals')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
       table.string('name').notNullable()
       table.string('phone').notNullable()
       table.string('email').notNullable()

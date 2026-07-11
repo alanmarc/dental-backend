@@ -23,7 +23,7 @@ export default class extends BaseSchema {
         .notNullable()
         .references('id')
         .inTable('branches')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
