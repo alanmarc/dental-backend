@@ -31,11 +31,20 @@ export default class InitialDataSeeder extends BaseSeeder {
       address: 'Av. Principal #123. Puebla, Puebla México',
     })
 
-    const [adminRole, doctorRole, assistantRole] = await Promise.all([
+    const [superAdminRole, adminRole, doctorRole, assistantRole] = await Promise.all([
+      Role.findByOrFail('name', 'super_admin'),
       Role.findByOrFail('name', 'admin'),
       Role.findByOrFail('name', 'doctor'),
       Role.findByOrFail('name', 'assistant'),
     ])
+
+    await User.create({
+      fullName: 'Super Admin',
+      email: 'superadmin@example.com',
+      password: 'password',
+      roleId: superAdminRole.id,
+      branchId: branch.id,
+    })
 
     await User.create({
       fullName: 'El jefe tilin',

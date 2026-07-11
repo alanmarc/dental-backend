@@ -16,6 +16,9 @@ export default class Hospital extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 
+  @column.dateTime()
+  declare deletedAt: DateTime | null
+
   //Relacion de un hospital a muchas sucursales
   @hasMany(() => Branch)
   declare branches: HasMany<typeof Branch>

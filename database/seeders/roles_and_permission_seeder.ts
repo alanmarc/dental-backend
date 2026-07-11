@@ -5,10 +5,14 @@ import { PERMISSIONS } from '../../app/constants/permissions.js'
 
 export default class RolesAndPermissionsSeeder extends BaseSeeder {
   public async run() {
-    const roles = await this.upsertRoles(['admin', 'doctor', 'assistant', 'patient'])
+    const roles = await this.upsertRoles(['super_admin', 'admin', 'doctor', 'assistant', 'patient'])
     const permissions = await this.upsertPermissions(this.flattenPermissions())
 
     const permByName = (name: string) => permissions.find((p) => p.name === name)!
+
+    await roles.super_admin
+      .related('permissions')
+      .sync(this.pivotFor(this.flattenPermissions(), permByName))
 
     await roles.admin
       .related('permissions')
@@ -36,6 +40,11 @@ export default class RolesAndPermissionsSeeder extends BaseSeeder {
             PERMISSIONS.medicalHistories.updateAny,
             PERMISSIONS.medicalHistories.deleteAny,
             PERMISSIONS.medicalHistories.restoreAny,
+            PERMISSIONS.branches.view,
+            PERMISSIONS.branches.createOwn,
+            PERMISSIONS.branches.updateOwn,
+            PERMISSIONS.branches.deleteOwn,
+            PERMISSIONS.branches.restoreOwn,
           ],
           permByName
         )
@@ -110,7 +119,13 @@ export default class RolesAndPermissionsSeeder extends BaseSeeder {
     for (const name of names) {
       result[name] = existing.find((r) => r.name === name) ?? (await Role.create({ name }))
     }
-    return result as { admin: Role; doctor: Role; assistant: Role; patient: Role }
+    return result as {
+      super_admin: Role
+      admin: Role
+      doctor: Role
+      assistant: Role
+      patient: Role
+    }
   }
 
   private async upsertPermissions(names: string[]) {

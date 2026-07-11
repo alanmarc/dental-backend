@@ -31,6 +31,9 @@ export default class Branch extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 
+  @column.dateTime()
+  declare deletedAt: DateTime | null
+
   //Una sucursal
   @belongsTo(() => Hospital)
   declare hospital: BelongsTo<typeof Hospital>

@@ -38,4 +38,22 @@ export const PERMISSIONS = {
     restoreOwn: 'medical_histories.restore.own',
     restoreAny: 'medical_histories.restore.any',
   },
+  hospitals: {
+    view: 'hospitals.view',
+    create: 'hospitals.create',
+    update: 'hospitals.update',
+    delete: 'hospitals.delete',
+    restore: 'hospitals.restore',
+  },
+  branches: {
+    view: 'branches.view',
+    createOwn: 'branches.create.own',
+    createAny: 'branches.create.any',
+    updateOwn: 'branches.update.own',
+    updateAny: 'branches.update.any',
+    deleteOwn: 'branches.delete.own',
+    deleteAny: 'branches.delete.any',
+    restoreOwn: 'branches.restore.own',
+    restoreAny: 'branches.restore.any',
+  },
 } as const

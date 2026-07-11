@@ -17,6 +17,7 @@ export default class extends BaseSchema {
       table.string('phone').notNullable()
       table.string('email').notNullable()
       table.string('address').notNullable()
+      table.timestamp('deleted_at', { useTz: true }).nullable()
       table.timestamp('created_at')
       table.timestamp('updated_at')
     })

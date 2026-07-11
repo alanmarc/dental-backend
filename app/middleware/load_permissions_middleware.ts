@@ -7,6 +7,7 @@ export default class LoadPermissionsMiddleware {
       await ctx.auth.user.load('role', (roleQuery) => {
         roleQuery.preload('permissions')
       })
+      await ctx.auth.user.load('branch')
     }
     return next()
   }
