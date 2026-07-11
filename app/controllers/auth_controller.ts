@@ -8,20 +8,24 @@ export default class AuthController {
   public async login(ctx: HttpContext) {
     const { email, password } = await ctx.request.validateUsing(loginValidator)
     try {
-      const user = await User.query().where('email', email).preload('role').first()
-      // console.log('Usuario autenticado:', user?.toJSON())
+      const user = await User.query()
+        .where('email', email)
+        .whereNull('deleted_at')
+        .preload('role')
+        .first()
 
       if (!user || !user.password || !(await hash.verify(user.password, password))) {
         return ApiResponse.error(ctx, 'Credenciales inválidas', 401)
       }
 
-      const token = await ctx.auth
-        .use('api')
-        .authenticateAsClient(user, ['Client'], { expiresIn: 20000 })
+      const token = await User.accessTokens.create(user, ['*'], {
+        expiresIn: '1 day',
+      })
 
-      return ApiResponse.success(ctx, token, 'Accesso exitoso')
+      return ApiResponse.success(ctx, token, 'Acceso exitoso')
     } catch (error) {
-      return ApiResponse.error(ctx, 'Error al iniciar sesion', 401, error.message)
+      console.error('Login error:', error)
+      return ApiResponse.error(ctx, 'Error al iniciar sesión', 401)
     }
   }
 }
