@@ -12,7 +12,19 @@ export default class RolesAndPermissionsSeeder extends BaseSeeder {
 
     await roles.super_admin
       .related('permissions')
-      .sync(this.pivotFor(this.flattenPermissions(), permByName))
+      .sync(
+        this.pivotFor(
+          [
+            ...this.flattenPermissions(),
+            PERMISSIONS.users.viewAny,
+            PERMISSIONS.patients.viewAny,
+            PERMISSIONS.appointments.viewAny,
+            PERMISSIONS.medicalHistories.viewAny,
+            PERMISSIONS.branches.viewAny,
+          ],
+          permByName
+        )
+      )
 
     await roles.admin
       .related('permissions')

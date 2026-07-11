@@ -15,9 +15,9 @@ export default class IndexBranchesController {
 
       let query = Branch.query().whereNull('deleted_at')
 
-      // Si el actor no tiene branches.create.any, limitamos la búsqueda
+      // Si el actor no tiene branches.view.any, limitamos la búsqueda
       // a las sucursales de su propio hospital
-      if (!actor.hasPermission('branches.create.any')) {
+      if (!actor.hasPermission('branches.view.any')) {
         query = query.where('hospital_id', actor.branch.hospitalId)
       }
 

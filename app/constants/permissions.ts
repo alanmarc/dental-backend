@@ -2,6 +2,7 @@
 export const PERMISSIONS = {
   users: {
     view: 'users.view',
+    viewAny: 'users.view.any',
     create: 'users.create',
     update: 'users.update',
     delete: 'users.delete',
@@ -10,6 +11,7 @@ export const PERMISSIONS = {
   },
   patients: {
     view: 'patients.view',
+    viewAny: 'patients.view.any',
     create: 'patients.create',
     updateOwn: 'patients.update.own',
     updateAny: 'patients.update.any',
@@ -20,6 +22,7 @@ export const PERMISSIONS = {
   },
   appointments: {
     view: 'appointments.view',
+    viewAny: 'appointments.view.any',
     create: 'appointments.create',
     updateOwn: 'appointments.update.own',
     updateAny: 'appointments.update.any',
@@ -30,6 +33,7 @@ export const PERMISSIONS = {
   },
   medicalHistories: {
     view: 'medical_histories.view',
+    viewAny: 'medical_histories.view.any',
     create: 'medical_histories.create',
     updateOwn: 'medical_histories.update.own',
     updateAny: 'medical_histories.update.any',
@@ -47,6 +51,7 @@ export const PERMISSIONS = {
   },
   branches: {
     view: 'branches.view',
+    viewAny: 'branches.view.any',
     createOwn: 'branches.create.own',
     createAny: 'branches.create.any',
     updateOwn: 'branches.update.own',

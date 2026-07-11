@@ -4,15 +4,27 @@ import ApiResponse from '../../utils/api_response.js'
 import PatientPolicy from '#policies/patient_policy'
 import { handleControllerError } from '../../utils/error_handler.js'
 
+import { getBranchIdsForActorHospital } from '../../services/scope_service.js'
+
 export default class IndexPatientsController {
   public async handle(ctx: HttpContext) {
     try {
       const page = ctx.request.input('page', 1)
       const limit = ctx.request.input('limit', 10)
 
+      const actor = ctx.auth.user!
+
       await ctx.bouncer.with(PatientPolicy).authorize('view')
 
-      const patients = await Patient.query().paginate(page, limit)
+      const query = Patient.query()
+
+      // Enforce hospital scoping
+      if (!actor.hasPermission('patients.view.any')) {
+        const branchIds = await getBranchIdsForActorHospital(actor)
+        query.whereIn('branch_id', branchIds)
+      }
+
+      const patients = await query.paginate(page, limit)
 
       return ApiResponse.paginate(
         ctx,

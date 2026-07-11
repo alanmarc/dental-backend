@@ -4,6 +4,8 @@ import ApiResponse from '../../utils/api_response.js'
 import { handleControllerError } from '../../utils/error_handler.js'
 import MedicalHistory from '#models/medical_history'
 
+import { getBranchIdsForActorHospital } from '../../services/scope_service.js'
+
 export default class IndexMedicalHistoriesController {
   public async handle(ctx: HttpContext) {
     try {
@@ -11,8 +13,17 @@ export default class IndexMedicalHistoriesController {
 
       const page = ctx.request.input('page', 1)
       const limit = ctx.request.input('limit', 10)
+      const actor = ctx.auth.user!
 
-      const medicalHistories = await MedicalHistory.query().paginate(page, limit)
+      const query = MedicalHistory.query()
+
+      // Enforce hospital scoping
+      if (!actor.hasPermission('medical_histories.view.any')) {
+        const branchIds = await getBranchIdsForActorHospital(actor)
+        query.whereIn('branch_id', branchIds)
+      }
+
+      const medicalHistories = await query.paginate(page, limit)
 
       return ApiResponse.paginate(
         ctx,

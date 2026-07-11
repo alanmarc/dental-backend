@@ -19,10 +19,7 @@ test.group('Branches index', (group) => {
   }) => {
     const hospitalA = await Hospital.create({ name: 'Hospital A' })
     const branchA = await createBranch(hospitalA.id)
-    const actor = await createUserWithPermissions(
-      ['branches.view', 'branches.create.own'],
-      branchA.id
-    )
+    const actor = await createUserWithPermissions(['branches.view'], branchA.id)
 
     const hospitalB = await Hospital.create({ name: 'Hospital B' })
     const branchB = await createBranch(hospitalB.id)
@@ -40,7 +37,7 @@ test.group('Branches index', (group) => {
     client,
     assert,
   }) => {
-    const actor = await createUserWithPermissions(['branches.view', 'branches.create.any'])
+    const actor = await createUserWithPermissions(['branches.view', 'branches.view.any'])
 
     const hospitalA = await Hospital.create({ name: 'Hospital A' })
     const branchA = await createBranch(hospitalA.id)

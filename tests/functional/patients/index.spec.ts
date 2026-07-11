@@ -25,4 +25,45 @@ test.group('Patients index', (group) => {
     response.assertStatus(200)
     assert.lengthOf(response.body().data, 5)
   })
+
+  test('200 y filtra por hospital si es admin con patients.view', async ({ client, assert }) => {
+    const actor = await createUserWithPermissions(['patients.view'])
+
+    // Paciente en el mismo hospital/branch
+    const samePatient = await PatientFactory.merge({
+      userId: actor.id,
+      branchId: actor.branchId,
+    }).create()
+
+    // Paciente en otro hospital/branch
+    const otherDoctor = await createUserWithPermissions([])
+    const otherPatient = await PatientFactory.merge({
+      userId: otherDoctor.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+
+    const response = await client.get('/api/patients').loginAs(actor)
+
+    response.assertStatus(200)
+    const ids = response.body().data.map((p: any) => p.id)
+    assert.include(ids, samePatient.id)
+    assert.notInclude(ids, otherPatient.id)
+  })
+
+  test('200 y ve todo si es super_admin con patients.view.any', async ({ client, assert }) => {
+    const actor = await createUserWithPermissions(['patients.view', 'patients.view.any'])
+
+    // Paciente en otro hospital/branch
+    const otherDoctor = await createUserWithPermissions([])
+    const otherPatient = await PatientFactory.merge({
+      userId: otherDoctor.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+
+    const response = await client.get('/api/patients').loginAs(actor)
+
+    response.assertStatus(200)
+    const ids = response.body().data.map((p: any) => p.id)
+    assert.include(ids, otherPatient.id)
+  })
 })
