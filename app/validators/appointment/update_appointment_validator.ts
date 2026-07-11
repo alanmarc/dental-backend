@@ -32,12 +32,5 @@ export const updateAppointmentValidator = vine.compile(
     status: vine.enum(StatusAppointment).optional(),
     reason: vine.string().trim().optional(),
     note: vine.string().trim().optional(),
-    branchId: vine
-      .number()
-      .exists(async (db, value) => {
-        const branch = await db.from('branches').where('id', value).first()
-        return !!branch
-      })
-      .optional(),
   })
 )
