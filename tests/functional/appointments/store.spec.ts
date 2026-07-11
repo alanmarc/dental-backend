@@ -2,6 +2,11 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { createUserWithPermissions } from '#tests/helpers/permissions'
 import { PatientFactory } from '#database/factories/patient_factory'
+import { UserFactory } from '#database/factories/user_factory'
+import Role from '#models/role'
+import Permission from '#models/permission'
+import Hospital from '#models/hospital'
+import Branch from '#models/branch'
 import { DateTime } from 'luxon'
 
 test.group('Appointments store', (group) => {
@@ -9,6 +14,10 @@ test.group('Appointments store', (group) => {
 
   test('403 si el actor no tiene appointments.create', async ({ client }) => {
     const actor = await createUserWithPermissions([])
+    const doctorRole = await Role.firstOrCreate({ name: 'doctor' }, { name: 'doctor' })
+    actor.roleId = doctorRole.id
+    await actor.save()
+
     const patient = await PatientFactory.merge({
       userId: actor.id,
       branchId: actor.branchId,
@@ -20,7 +29,6 @@ test.group('Appointments store', (group) => {
       .json({
         userId: actor.id,
         patientId: patient.id,
-        branchId: actor.branchId,
         dateTime: DateTime.now().plus({ days: 1 }).toISO(),
         duration: 30,
         status: 'scheduled',
@@ -32,6 +40,15 @@ test.group('Appointments store', (group) => {
 
   test('201 y crea la cita si el actor tiene appointments.create', async ({ client, assert }) => {
     const actor = await createUserWithPermissions(['appointments.create'])
+    const doctorRole = await Role.firstOrCreate({ name: 'doctor' }, { name: 'doctor' })
+    const perm = await Permission.firstOrCreate(
+      { name: 'appointments.create' },
+      { name: 'appointments.create' }
+    )
+    await doctorRole.related('permissions').sync([perm.id])
+    actor.roleId = doctorRole.id
+    await actor.save()
+
     const patient = await PatientFactory.merge({
       userId: actor.id,
       branchId: actor.branchId,
@@ -44,7 +61,6 @@ test.group('Appointments store', (group) => {
     const response = await client.post('/api/appointments').loginAs(actor).json({
       userId: actor.id,
       patientId: patient.id,
-      branchId: actor.branchId,
       dateTime: futureTime.toISO(),
       duration: 30,
       status: 'scheduled',
@@ -58,6 +74,15 @@ test.group('Appointments store', (group) => {
 
   test('422 si hay conflicto de horario en la sucursal', async ({ client }) => {
     const actor = await createUserWithPermissions(['appointments.create'])
+    const doctorRole = await Role.firstOrCreate({ name: 'doctor' }, { name: 'doctor' })
+    const perm = await Permission.firstOrCreate(
+      { name: 'appointments.create' },
+      { name: 'appointments.create' }
+    )
+    await doctorRole.related('permissions').sync([perm.id])
+    actor.roleId = doctorRole.id
+    await actor.save()
+
     const patient = await PatientFactory.merge({
       userId: actor.id,
       branchId: actor.branchId,
@@ -71,7 +96,6 @@ test.group('Appointments store', (group) => {
     await client.post('/api/appointments').loginAs(actor).json({
       userId: actor.id,
       patientId: patient.id,
-      branchId: actor.branchId,
       dateTime: futureTime.toISO(),
       duration: 30,
       status: 'scheduled',
@@ -85,7 +109,6 @@ test.group('Appointments store', (group) => {
       .json({
         userId: actor.id,
         patientId: patient.id,
-        branchId: actor.branchId,
         dateTime: futureTime.plus({ minutes: 15 }).toISO(), // Se traslapa con la cita de 10:00 a 10:30
         duration: 30,
         status: 'scheduled',
@@ -96,6 +119,54 @@ test.group('Appointments store', (group) => {
     response.assertTextIncludes('Horario ocupado en esta sucursal')
   })
 
+  test('422 si el paciente y el doctor pertenecen a sucursales distintas', async ({ client }) => {
+    const actor = await createUserWithPermissions(['appointments.create'])
+    const doctorRole = await Role.firstOrCreate({ name: 'doctor' }, { name: 'doctor' })
+    
+    // Crear un doctor en branch A
+    const hospital = await Hospital.create({ name: 'Test Hospital' })
+    const branchA = await Branch.create({
+      hospitalId: hospital.id,
+      name: 'Sucursal A',
+      phone: '123',
+      email: 'a@test.com',
+      address: 'Calle A',
+    })
+    
+    const doctor = await UserFactory.merge({
+      roleId: doctorRole.id,
+      branchId: branchA.id,
+    }).create()
+
+    // Crear un paciente en branch B (diferente sucursal)
+    const branchB = await Branch.create({
+      hospitalId: hospital.id,
+      name: 'Sucursal B',
+      phone: '456',
+      email: 'b@test.com',
+      address: 'Calle B',
+    })
+    
+    const patient = await PatientFactory.merge({
+      userId: doctor.id,
+      branchId: branchB.id,
+    }).create()
+
+    const futureTime = DateTime.now().plus({ days: 1 })
+
+    const response = await client.post('/api/appointments').loginAs(actor).json({
+      userId: doctor.id,
+      patientId: patient.id,
+      dateTime: futureTime.toISO(),
+      duration: 30,
+      status: 'scheduled',
+      reason: 'Consulta cruzada',
+    })
+
+    response.assertStatus(422)
+    response.assertTextIncludes('El paciente y el doctor pertenecen a sucursales distintas')
+  })
+
   test('422 si los IDs no existen', async ({ client }) => {
     const actor = await createUserWithPermissions(['appointments.create'])
     const response = await client
@@ -104,7 +175,6 @@ test.group('Appointments store', (group) => {
       .json({
         userId: 999999,
         patientId: 999999,
-        branchId: 999999,
         dateTime: DateTime.now().plus({ days: 1 }).toISO(),
         duration: 30,
         status: 'scheduled',
@@ -118,7 +188,6 @@ test.group('Appointments store', (group) => {
     const response = await client.post('/api/appointments').json({
       userId: 1,
       patientId: 1,
-      branchId: 1,
       dateTime: DateTime.now().plus({ days: 1 }).toISO(),
       duration: 30,
       status: 'scheduled',

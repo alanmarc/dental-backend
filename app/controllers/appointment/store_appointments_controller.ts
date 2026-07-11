@@ -5,16 +5,31 @@ import ApiResponse from '../../utils/api_response.js'
 import AppointmentPolicy from '#policies/appointment_policy'
 import { handleControllerError } from '../../utils/error_handler.js'
 import { isAppointmentAvailable } from '../../utils/validate_availability.js'
+import Patient from '#models/patient'
+import User from '#models/user'
 
 export default class StoreAppointmentsController {
   public async handle(ctx: HttpContext) {
     try {
       await ctx.bouncer.with(AppointmentPolicy).authorize('create')
 
-      const { patientId, branchId, userId, dateTime, duration, status, reason } =
+      const { patientId, userId, dateTime, duration, status, reason } =
         await ctx.request.validateUsing(storeAppointmentsValidator)
 
-      const isAvailable = await isAppointmentAvailable(branchId, dateTime, duration)
+      const [patient, doctor] = await Promise.all([
+        Patient.findOrFail(patientId),
+        User.findOrFail(userId),
+      ])
+
+      if (patient.branchId !== doctor.branchId) {
+        return ApiResponse.error(
+          ctx,
+          'El paciente y el doctor pertenecen a sucursales distintas',
+          422
+        )
+      }
+
+      const isAvailable = await isAppointmentAvailable(doctor.branchId, dateTime, duration)
 
       if (!isAvailable) {
         return ApiResponse.error(ctx, 'Horario ocupado en esta sucursal', 422)
@@ -23,7 +38,7 @@ export default class StoreAppointmentsController {
       const appointment = await Appointment.create({
         patientId,
         userId,
-        branchId,
+        branchId: doctor.branchId,
         dateTime,
         duration,
         status,

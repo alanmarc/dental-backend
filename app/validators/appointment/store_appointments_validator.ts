@@ -5,16 +5,16 @@ import { DateTime } from 'luxon'
 export const storeAppointmentsValidator = vine.compile(
   vine.object({
     userId: vine.number().exists(async (db, value) => {
-      const user = await db.from('users').where('id', value).first()
+      const user = await db.from('users')
+        .join('roles', 'roles.id', 'users.role_id')
+        .where('users.id', value)
+        .where('roles.name', 'doctor')
+        .first()
       return !!user
     }),
     patientId: vine.number().exists(async (db, value) => {
       const patient = await db.from('patients').where('id', value).first()
       return !!patient
-    }),
-    branchId: vine.number().exists(async (db, value) => {
-      const branch = await db.from('branches').where('id', value).first()
-      return !!branch
     }),
     dateTime: vine.string().transform((value) => {
       const dt = DateTime.fromISO(value)
