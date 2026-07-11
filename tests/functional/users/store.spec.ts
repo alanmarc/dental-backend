@@ -17,10 +17,12 @@ test.group('Users store', (group) => {
 
   test('201 y crea el usuario si el actor tiene users.create', async ({ client, assert }) => {
     const actor = await createUserWithPermissions(['users.create'])
-    const response = await client
-      .post('/api/users')
-      .loginAs(actor)
-      .json({ fullName: 'Nuevo', email: 'nuevo@test.com', password: 'secret123' })
+    const response = await client.post('/api/users').loginAs(actor).json({
+      fullName: 'Nuevo',
+      email: 'nuevo@test.com',
+      password: 'secret123',
+      branchId: actor.branchId,
+    })
 
     response.assertStatus(201)
     assert.equal(response.body().data.email, 'nuevo@test.com')
@@ -32,12 +34,15 @@ test.group('Users store', (group) => {
       fullName: 'A',
       email: 'dup@test.com',
       password: 'secret123',
+      branchId: actor.branchId,
     })
 
-    const response = await client
-      .post('/api/users')
-      .loginAs(actor)
-      .json({ fullName: 'B', email: 'dup@test.com', password: 'secret123' })
+    const response = await client.post('/api/users').loginAs(actor).json({
+      fullName: 'B',
+      email: 'dup@test.com',
+      password: 'secret123',
+      branchId: actor.branchId,
+    })
 
     response.assertStatus(422)
   })

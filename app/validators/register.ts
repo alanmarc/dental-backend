@@ -12,5 +12,9 @@ export const registerValidator = vine.compile(
         return !user // Retorna true si el correo NO existe
       }),
     password: vine.string().minLength(8),
+    branchId: vine.number().exists(async (db, value) => {
+      const branch = await db.from('branches').where('id', value).first()
+      return !!branch
+    }),
   })
 )

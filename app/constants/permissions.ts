@@ -11,9 +11,12 @@ export const PERMISSIONS = {
   patients: {
     view: 'patients.view',
     create: 'patients.create',
-    update: 'patients.update',
-    delete: 'patients.delete',
-    restore: 'patients.restore',
+    updateOwn: 'patients.update.own',
+    updateAny: 'patients.update.any',
+    deleteOwn: 'patients.delete.own',
+    deleteAny: 'patients.delete.any',
+    restoreOwn: 'patients.restore.own',
+    restoreAny: 'patients.restore.any',
   },
   appointments: {
     view: 'appointments.view',

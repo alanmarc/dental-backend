@@ -8,14 +8,12 @@ export default class RestorePatientsController {
   public async handle(ctx: HttpContext) {
     try {
       const patient = await Patient.findOrFail(ctx.params.id)
-
-      await ctx.auth.user?.load('role')
-      await ctx.bouncer.with(PatientPolicy).authorize('delete', patient)
+      await ctx.bouncer.with(PatientPolicy).authorize('restore', patient)
 
       patient.deletedAt = null
       await patient.save()
 
-      return ApiResponse.success(ctx, patient.toJSON().data, 'Paciente restaurado')
+      return ApiResponse.success(ctx, patient.toJSON(), 'Paciente restaurado')
     } catch (error) {
       return handleControllerError(ctx, error)
     }

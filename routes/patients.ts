@@ -9,7 +9,6 @@ const { default: UpdatePatientsController } =
   await import('#controllers/patient/update_patients_controller')
 const { default: SoftDeletePatientsController } =
   await import('#controllers/patient/soft_delete_patients_controller')
-
 const { default: RestorePatientsController } =
   await import('#controllers/patient/restore_patients_controller')
 
@@ -23,7 +22,7 @@ const patients = (): void => {
       router.put('/:id/restore', [RestorePatientsController]).as('restore')
     })
     .prefix('/patients')
-    .use(middleware.auth())
+    .use([middleware.auth(), middleware.loadPermissions()])
 }
 
 export default patients

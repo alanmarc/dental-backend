@@ -8,17 +8,14 @@ import PatientPolicy from '#policies/patient_policy'
 export default class UpdatePatientsController {
   public async handle(ctx: HttpContext) {
     try {
-      await ctx.auth.user?.load('role')
-      await ctx.bouncer.with(PatientPolicy).authorize('update')
-
       const patient = await Patient.findOrFail(ctx.params.id)
+      await ctx.bouncer.with(PatientPolicy).authorize('update', patient)
+
       const data = await ctx.request.validateUsing(updatePatientValidator)
-
       patient.merge(data)
-
       await patient.save()
 
-      return ApiResponse.success(ctx, patient.toJSON().data, 'Paciente actualizado')
+      return ApiResponse.success(ctx, patient.toJSON(), 'Paciente actualizado')
     } catch (error) {
       return handleControllerError(ctx, error)
     }

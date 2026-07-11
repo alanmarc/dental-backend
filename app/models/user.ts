@@ -41,7 +41,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare roleId: number | null
 
   @column()
-  declare branchId: number | null
+  declare branchId: number
 
   //Relacion con el token -- TODO: REvisar que sea un acceso por usuario
   @hasMany(() => AccessToken)
