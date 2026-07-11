@@ -13,10 +13,10 @@ export default class extends BaseSchema {
       table
         .integer('role_id')
         .unsigned()
+        .notNullable()
         .references('id')
         .inTable('roles')
-        .onDelete('SET NULL')
-        .nullable()
+        .onDelete('RESTRICT')
       table
         .integer('branch_id')
         .unsigned()

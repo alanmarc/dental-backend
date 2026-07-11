@@ -10,13 +10,14 @@ export default class StoreUserController {
     try {
       await ctx.bouncer.with(UserPolicy).authorize('create')
 
-      const { fullName, email, password, branchId } =
+      const { fullName, email, password, branchId, roleId } =
         await ctx.request.validateUsing(registerValidator)
       const user = await User.create({
         fullName,
         email,
         password,
         branchId,
+        roleId,
       })
       return ApiResponse.success(ctx, user.toJSON(), 'Usuario registrado', 201)
     } catch (error) {

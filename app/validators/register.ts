@@ -16,5 +16,9 @@ export const registerValidator = vine.compile(
       const branch = await db.from('branches').where('id', value).first()
       return !!branch
     }),
+    roleId: vine.number().exists(async (db, value) => {
+      const role = await db.from('roles').where('id', value).first()
+      return !!role
+    }),
   })
 )

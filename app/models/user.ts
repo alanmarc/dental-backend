@@ -38,7 +38,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare deletedAt: DateTime | null
 
   @column()
-  declare roleId: number | null
+  declare roleId: number
 
   @column()
   declare branchId: number
