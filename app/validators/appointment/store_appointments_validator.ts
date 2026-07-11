@@ -5,7 +5,8 @@ import { DateTime } from 'luxon'
 export const storeAppointmentsValidator = vine.compile(
   vine.object({
     userId: vine.number().exists(async (db, value) => {
-      const user = await db.from('users')
+      const user = await db
+        .from('users')
         .join('roles', 'roles.id', 'users.role_id')
         .where('users.id', value)
         .where('roles.name', 'doctor')

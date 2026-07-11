@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 
 export async function isAppointmentAvailable(
-  branchId: number,
+  userId: number,
   start: DateTime,
   duration: number,
   excludeId?: number
@@ -19,7 +19,7 @@ export async function isAppointmentAvailable(
 
   const query = db
     .from('appointments')
-    .where('branch_id', branchId)
+    .where('user_id', userId)
     .andWhereRaw(`date_time < ? AND (date_time + make_interval(mins => duration)) > ?`, [
       endSQL,
       startSQL,

@@ -29,7 +29,7 @@ export default class StoreAppointmentsController {
         )
       }
 
-      const isAvailable = await isAppointmentAvailable(doctor.branchId, dateTime, duration)
+      const isAvailable = await isAppointmentAvailable(userId, dateTime, duration)
 
       if (!isAvailable) {
         return ApiResponse.error(ctx, 'Horario ocupado en esta sucursal', 422)

@@ -36,7 +36,7 @@ export default class UpdateAppointmentsController {
       const dateTime = data.dateTime ?? appointment.dateTime
       const duration = data.duration ?? appointment.duration
 
-      const isAvailable = await isAppointmentAvailable(branchId, dateTime, duration, appointment.id)
+      const isAvailable = await isAppointmentAvailable(doctorId, dateTime, duration, appointment.id)
 
       if (!isAvailable) {
         return ApiResponse.error(ctx, 'Horario ocupado en esta sucursal', 422)

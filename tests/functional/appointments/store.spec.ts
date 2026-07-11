@@ -119,10 +119,72 @@ test.group('Appointments store', (group) => {
     response.assertTextIncludes('Horario ocupado en esta sucursal')
   })
 
+  test('201 si dos doctores distintos de la misma sucursal agendan citas a la misma hora', async ({
+    client,
+    assert,
+  }) => {
+    const actor = await createUserWithPermissions(['appointments.create'])
+    const doctorRole = await Role.firstOrCreate({ name: 'doctor' }, { name: 'doctor' })
+    const perm = await Permission.firstOrCreate(
+      { name: 'appointments.create' },
+      { name: 'appointments.create' }
+    )
+    await doctorRole.related('permissions').sync([perm.id])
+
+    // Crear dos doctores en la misma sucursal (branch del actor)
+    const doctorA = await UserFactory.merge({
+      roleId: doctorRole.id,
+      branchId: actor.branchId,
+    }).create()
+
+    const doctorB = await UserFactory.merge({
+      roleId: doctorRole.id,
+      branchId: actor.branchId,
+    }).create()
+
+    // Crear dos pacientes en la misma sucursal
+    const patientA = await PatientFactory.merge({
+      userId: doctorA.id,
+      branchId: actor.branchId,
+    }).create()
+
+    const patientB = await PatientFactory.merge({
+      userId: doctorB.id,
+      branchId: actor.branchId,
+    }).create()
+
+    const futureTime = DateTime.now()
+      .plus({ days: 1 })
+      .set({ hour: 10, minute: 0, second: 0, millisecond: 0 })
+
+    // Agendar cita para doctorA
+    const resA = await client.post('/api/appointments').loginAs(actor).json({
+      userId: doctorA.id,
+      patientId: patientA.id,
+      dateTime: futureTime.toISO(),
+      duration: 30,
+      status: 'scheduled',
+      reason: 'Cita Doctor A',
+    })
+    resA.assertStatus(201)
+
+    // Agendar cita para doctorB a la misma hora (debería permitirse)
+    const resB = await client.post('/api/appointments').loginAs(actor).json({
+      userId: doctorB.id,
+      patientId: patientB.id,
+      dateTime: futureTime.toISO(),
+      duration: 30,
+      status: 'scheduled',
+      reason: 'Cita Doctor B',
+    })
+    resB.assertStatus(201)
+    assert.equal(resB.body().data.branchId, actor.branchId)
+  })
+
   test('422 si el paciente y el doctor pertenecen a sucursales distintas', async ({ client }) => {
     const actor = await createUserWithPermissions(['appointments.create'])
     const doctorRole = await Role.firstOrCreate({ name: 'doctor' }, { name: 'doctor' })
-    
+
     // Crear un doctor en branch A
     const hospital = await Hospital.create({ name: 'Test Hospital' })
     const branchA = await Branch.create({
@@ -132,7 +194,7 @@ test.group('Appointments store', (group) => {
       email: 'a@test.com',
       address: 'Calle A',
     })
-    
+
     const doctor = await UserFactory.merge({
       roleId: doctorRole.id,
       branchId: branchA.id,
@@ -146,7 +208,7 @@ test.group('Appointments store', (group) => {
       email: 'b@test.com',
       address: 'Calle B',
     })
-    
+
     const patient = await PatientFactory.merge({
       userId: doctor.id,
       branchId: branchB.id,
