@@ -4,6 +4,7 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import User from '#models/user'
 import Patient from '#models/patient'
 import Appointment from '#models/appointment'
+import Branch from './branch.js'
 
 export default class MedicalHistory extends BaseModel {
   @column({ isPrimary: true })
@@ -19,6 +20,9 @@ export default class MedicalHistory extends BaseModel {
   declare appointmentId: number
 
   @column()
+  declare branchId: number
+
+  @column()
   declare diagnosis: string | null
 
   @column()
@@ -26,6 +30,9 @@ export default class MedicalHistory extends BaseModel {
 
   @column()
   declare notes: string | null
+
+  @column.dateTime()
+  declare deletedAt: DateTime | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -44,4 +51,8 @@ export default class MedicalHistory extends BaseModel {
   // Relación con la cita
   @belongsTo(() => Appointment)
   declare appointment: BelongsTo<typeof Appointment>
+
+  // Relación con la sucursal
+  @belongsTo(() => Branch)
+  declare branch: BelongsTo<typeof Branch>
 }

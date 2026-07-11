@@ -17,5 +17,9 @@ export const storeMedicalHistoriesValidator = vine.compile(
     diagnosis: vine.string(),
     treatment: vine.string(),
     notes: vine.string().optional(),
+    branchId: vine.number().exists(async (db, value) => {
+      const branch = await db.from('branches').where('id', value).first()
+      return !!branch
+    }),
   })
 )

@@ -9,19 +9,17 @@ import { handlerEmptyRequest } from '../../utils/empty_request_handler.js'
 export default class UpdateMedicalHistoriesController {
   public async handle(ctx: HttpContext) {
     try {
-      await ctx.auth.user?.load('role')
-      await ctx.bouncer.with(MedicalHistoriePolicy).authorize('update')
-
-      const medicalHistorie = await MedicalHistory.findOrFail(ctx.params.id)
+      const medicalHistory = await MedicalHistory.findOrFail(ctx.params.id)
+      await ctx.bouncer.with(MedicalHistoriePolicy).authorize('update', medicalHistory)
 
       const data = await ctx.request.validateUsing(updateMedicalHistoriesValidator)
       handlerEmptyRequest(data)
 
-      medicalHistorie.merge(data)
+      medicalHistory.merge(data)
 
-      await medicalHistorie.save()
+      await medicalHistory.save()
 
-      return ApiResponse.success(ctx, medicalHistorie.toJSON().data, 'Historial actualizado')
+      return ApiResponse.success(ctx, medicalHistory.toJSON(), 'Historial actualizado')
     } catch (error) {
       return handleControllerError(ctx, error)
     }

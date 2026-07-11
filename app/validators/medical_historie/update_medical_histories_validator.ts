@@ -19,5 +19,12 @@ export const updateMedicalHistoriesValidator = vine.compile(
     diagnosis: vine.string().optional(),
     treatment: vine.string().optional(),
     notes: vine.string().optional(),
+    branchId: vine
+      .number()
+      .exists(async (db, value) => {
+        const branch = await db.from('branches').where('id', value).first()
+        return !!branch
+      })
+      .optional(),
   })
 )

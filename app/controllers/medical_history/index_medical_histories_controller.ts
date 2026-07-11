@@ -7,7 +7,6 @@ import MedicalHistory from '#models/medical_history'
 export default class IndexMedicalHistoriesController {
   public async handle(ctx: HttpContext) {
     try {
-      await ctx.auth.user?.load('role')
       await ctx.bouncer.with(MedicalHistoriePolicy).authorize('view')
 
       const page = ctx.request.input('page', 1)

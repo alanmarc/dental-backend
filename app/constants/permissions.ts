@@ -31,6 +31,11 @@ export const PERMISSIONS = {
   medicalHistories: {
     view: 'medical_histories.view',
     create: 'medical_histories.create',
-    update: 'medical_histories.update',
+    updateOwn: 'medical_histories.update.own',
+    updateAny: 'medical_histories.update.any',
+    deleteOwn: 'medical_histories.delete.own',
+    deleteAny: 'medical_histories.delete.any',
+    restoreOwn: 'medical_histories.restore.own',
+    restoreAny: 'medical_histories.restore.any',
   },
 } as const
