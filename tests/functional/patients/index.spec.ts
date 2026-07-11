@@ -15,8 +15,10 @@ test.group('Patients index', (group) => {
   test('200 y respeta paginación con patients.view', async ({ client, assert }) => {
     const actor = await createUserWithPermissions(['patients.view'])
 
-    // Crear algunos pacientes de prueba asignados al actor
-    await PatientFactory.merge({ userId: actor.id, branchId: actor.branchId }).createMany(15)
+    // Crear algunos pacientes de prueba asignados al actor de forma secuencial
+    for (let i = 0; i < 15; i++) {
+      await PatientFactory.merge({ userId: actor.id, branchId: actor.branchId }).create()
+    }
 
     const response = await client.get('/api/patients?page=1&limit=5').loginAs(actor)
 

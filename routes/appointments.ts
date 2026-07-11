@@ -22,7 +22,7 @@ const appointments = (): void => {
       router.put('/:id/restore', [RestoreAppointmentsController]).as('restore')
     })
     .prefix('/appointments')
-    .use(middleware.auth())
+    .use([middleware.auth(), middleware.loadPermissions()])
 }
 
 export default appointments

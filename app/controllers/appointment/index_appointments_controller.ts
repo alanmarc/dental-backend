@@ -7,7 +7,6 @@ import { handleControllerError } from '../../utils/error_handler.js'
 export default class IndexAppointmentsController {
   public async handle(ctx: HttpContext) {
     try {
-      await ctx.auth.user?.load('role')
       await ctx.bouncer.with(AppointmentPolicy).authorize('view')
 
       const page = ctx.request.input('page', 1)
@@ -15,17 +14,22 @@ export default class IndexAppointmentsController {
       const status = ctx.request.input('status', undefined)
 
       // Inicia la consulta
-      const query = Appointment.query().preload('patient').preload('user').preload('branch')
+      const query = Appointment.query()
 
       // Aplica el filtro si existe
       if (status) {
         query.where('status', status)
-        // O usando el scope (ambas formas funcionan):
-        // query.apply(scope => scope.byStatus(status))
       }
 
       // Ejecuta la consulta CON los filtros aplicados
       const appointments = await query.paginate(page, limit)
+
+      // Carga las relaciones de forma secuencial para evitar advertencias de pg concurrente
+      for (const appointment of appointments) {
+        await appointment.load('patient')
+        await appointment.load('user')
+        await appointment.load('branch')
+      }
 
       return ApiResponse.paginate(
         ctx,

@@ -14,7 +14,9 @@ test.group('Users index', (group) => {
 
   test('200 y respeta paginación con users.view', async ({ client, assert }) => {
     const actor = await createUserWithPermissions(['users.view'])
-    await UserFactory.merge({ roleId: actor.roleId }).createMany(15)
+    for (let i = 0; i < 15; i++) {
+      await UserFactory.merge({ roleId: actor.roleId }).create()
+    }
 
     const response = await client.get('/api/users?page=1&limit=5').loginAs(actor)
 

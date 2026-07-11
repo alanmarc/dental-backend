@@ -9,13 +9,12 @@ export default class RestoreAppointmentsController {
     try {
       const appointment = await Appointment.findOrFail(ctx.params.id)
 
-      await ctx.auth.user?.load('role')
-      await ctx.bouncer.with(AppointmentPolicy).authorize('delete', appointment)
+      await ctx.bouncer.with(AppointmentPolicy).authorize('restore', appointment)
 
       appointment.deletedAt = null
       await appointment.save()
 
-      return ApiResponse.success(ctx, appointment.toJSON().data, 'Cita restaurada')
+      return ApiResponse.success(ctx, appointment.toJSON(), 'Cita restaurada')
     } catch (error) {
       return handleControllerError(ctx, error)
     }

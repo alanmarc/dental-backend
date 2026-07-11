@@ -6,9 +6,11 @@ import Branch from '#models/branch'
 
 export async function createUserWithPermissions(permissionNames: string[]) {
   const role = await Role.create({ name: `test-role-${Date.now()}` })
-  const permissions = await Promise.all(
-    permissionNames.map((name) => Permission.firstOrCreate({ name }, { name }))
-  )
+  const permissions: Permission[] = []
+  for (const name of permissionNames) {
+    const p = await Permission.firstOrCreate({ name }, { name })
+    permissions.push(p)
+  }
   await role.related('permissions').sync(permissions.map((p) => p.id))
 
   const hospital = await Hospital.create({ name: `Hospital-${Date.now()}` })

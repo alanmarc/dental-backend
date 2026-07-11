@@ -9,10 +9,8 @@ import { isAppointmentAvailable } from '../../utils/validate_availability.js'
 export default class UpdateAppointmentsController {
   public async handle(ctx: HttpContext) {
     try {
-      await ctx.auth.user?.load('role')
-      await ctx.bouncer.with(AppointmentPolicy).authorize('update')
-
       const appointment = await Appointment.findOrFail(ctx.params.id)
+      await ctx.bouncer.with(AppointmentPolicy).authorize('update', appointment)
 
       const data = await ctx.request.validateUsing(updateAppointmentValidator)
 
@@ -20,7 +18,7 @@ export default class UpdateAppointmentsController {
       const duration = data.duration ?? appointment.duration
       const branchId = appointment.branchId
 
-      const isAvailable = await isAppointmentAvailable(branchId, dateTime, duration)
+      const isAvailable = await isAppointmentAvailable(branchId, dateTime, duration, appointment.id)
 
       if (!isAvailable) {
         return ApiResponse.error(ctx, 'Horario ocupado en esta sucursal', 422)
@@ -30,7 +28,7 @@ export default class UpdateAppointmentsController {
 
       await appointment.save()
 
-      return ApiResponse.success(ctx, appointment.toJSON().data, 'Cita actualizada')
+      return ApiResponse.success(ctx, appointment.toJSON(), 'Cita actualizada')
     } catch (error) {
       return handleControllerError(ctx, error)
     }

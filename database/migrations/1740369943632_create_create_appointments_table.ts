@@ -32,10 +32,10 @@ export default class extends BaseSchema {
       table
         .integer('branch_id')
         .unsigned()
+        .notNullable()
         .references('id')
         .inTable('branches')
-        .onDelete('SET NULL')
-        .nullable()
+        .onDelete('CASCADE')
       table.timestamps(true, true)
     })
   }

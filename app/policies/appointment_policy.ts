@@ -1,24 +1,38 @@
 import { BasePolicy } from '@adonisjs/bouncer'
 import User from '#models/user'
 import Appointment from '#models/appointment'
+import { AuthorizerResponse } from '@adonisjs/bouncer/types'
 
 export default class AppointmentPolicy extends BasePolicy {
-  async view(user: User) {
-    return ['admin', 'doctor', 'assistant'].includes(user.role.name)
+  async view(actor: User): Promise<AuthorizerResponse> {
+    return actor.hasPermission('appointments.view')
   }
 
-  async create(user: User) {
-    return ['admin', 'doctor', 'assistant'].includes(user.role.name)
+  async create(actor: User): Promise<AuthorizerResponse> {
+    return actor.hasPermission('appointments.create')
   }
 
-  async delete(user: User, appointment: Appointment) {
-    if (user.role.name === 'admin') {
-      return true
+  async update(actor: User, appointment: Appointment): Promise<AuthorizerResponse> {
+    if (actor.hasPermission('appointments.update.any')) return true
+    if (actor.hasPermission('appointments.update.own')) {
+      return appointment.userId === actor.id
     }
-    return appointment.userId === user.id
+    return false
   }
 
-  async update(user: User) {
-    return ['doctor', 'assistant'].includes(user.role.name)
+  async delete(actor: User, appointment: Appointment): Promise<AuthorizerResponse> {
+    if (actor.hasPermission('appointments.delete.any')) return true
+    if (actor.hasPermission('appointments.delete.own')) {
+      return appointment.userId === actor.id
+    }
+    return false
+  }
+
+  async restore(actor: User, appointment: Appointment): Promise<AuthorizerResponse> {
+    if (actor.hasPermission('appointments.restore.any')) return true
+    if (actor.hasPermission('appointments.restore.own')) {
+      return appointment.userId === actor.id
+    }
+    return false
   }
 }

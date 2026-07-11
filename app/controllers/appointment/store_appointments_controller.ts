@@ -9,7 +9,6 @@ import { isAppointmentAvailable } from '../../utils/validate_availability.js'
 export default class StoreAppointmentsController {
   public async handle(ctx: HttpContext) {
     try {
-      await ctx.auth.user?.load('role')
       await ctx.bouncer.with(AppointmentPolicy).authorize('create')
 
       const { patientId, branchId, userId, dateTime, duration, status, reason } =
@@ -31,7 +30,7 @@ export default class StoreAppointmentsController {
         reason,
       })
 
-      return ApiResponse.success(ctx, appointment.toJSON().data, 'Cita registrada', 201)
+      return ApiResponse.success(ctx, appointment.toJSON(), 'Cita registrada', 201)
     } catch (error) {
       return handleControllerError(ctx, error)
     }

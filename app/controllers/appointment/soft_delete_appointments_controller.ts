@@ -9,14 +9,12 @@ export default class SoftDeleteAppointmentsController {
   public async handle(ctx: HttpContext) {
     try {
       const appointment = await Appointment.findOrFail(ctx.params.id)
-
-      await ctx.auth.user?.load('role')
       await ctx.bouncer.with(AppointmentPolicy).authorize('delete', appointment)
 
       appointment.deletedAt = DateTime.utc()
       await appointment.save()
 
-      return ApiResponse.success(ctx, appointment.toJSON().data, 'Cita eliminada (Soft)')
+      return ApiResponse.success(ctx, appointment.toJSON(), 'Cita eliminada (Soft)')
     } catch (error) {
       return handleControllerError(ctx, error)
     }

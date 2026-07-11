@@ -4,7 +4,8 @@ import db from '@adonisjs/lucid/services/db'
 export async function isAppointmentAvailable(
   branchId: number,
   start: DateTime,
-  duration: number
+  duration: number,
+  excludeId?: number
 ): Promise<boolean> {
   const end = start.plus({ minutes: duration })
 
@@ -16,7 +17,7 @@ export async function isAppointmentAvailable(
     throw new Error('Fecha inválida para la consulta SQL')
   }
 
-  const overlapping = await db
+  const query = db
     .from('appointments')
     .where('branch_id', branchId)
     .andWhereRaw(`date_time < ? AND (date_time + make_interval(mins => duration)) > ?`, [
@@ -24,7 +25,12 @@ export async function isAppointmentAvailable(
       startSQL,
     ])
     .whereNull('deleted_at')
-    .first()
+
+  if (excludeId) {
+    query.whereNot('id', excludeId)
+  }
+
+  const overlapping = await query.first()
 
   return !overlapping
 }

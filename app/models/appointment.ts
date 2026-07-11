@@ -18,7 +18,7 @@ export default class Appointment extends BaseModel {
   @column()
   declare branchId: number
 
-  @column()
+  @column.dateTime()
   declare dateTime: DateTime
 
   @column()
