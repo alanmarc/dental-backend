@@ -37,6 +37,10 @@ export default class extends BaseSchema {
         .inTable('branches')
         .onDelete('RESTRICT')
       table.timestamps(true, true)
+
+      table.index(['user_id', 'date_time'])
+      table.index(['branch_id', 'deleted_at'])
+      table.index('patient_id')
     })
   }
 

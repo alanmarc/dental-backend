@@ -31,6 +31,9 @@ export default class CreatePatientsTable extends BaseSchema {
 
       table.timestamp('created_at').defaultTo(this.now())
       table.timestamp('updated_at').nullable()
+
+      table.index(['branch_id', 'deleted_at'])
+      table.index('user_id')
     })
   }
 

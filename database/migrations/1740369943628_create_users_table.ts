@@ -27,6 +27,9 @@ export default class extends BaseSchema {
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
+
+      table.index(['branch_id', 'deleted_at'])
+      table.index('role_id')
     })
   }
 

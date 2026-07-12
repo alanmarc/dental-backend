@@ -20,6 +20,8 @@ export default class extends BaseSchema {
       table.timestamp('deleted_at', { useTz: true }).nullable()
       table.timestamp('created_at')
       table.timestamp('updated_at')
+
+      table.index(['hospital_id', 'deleted_at'])
     })
   }
 
