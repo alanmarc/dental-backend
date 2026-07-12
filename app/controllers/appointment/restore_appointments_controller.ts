@@ -7,7 +7,10 @@ import { handleControllerError } from '#utils/error_handler'
 export default class RestoreAppointmentsController {
   public async handle(ctx: HttpContext) {
     try {
-      const appointment = await Appointment.findOrFail(ctx.params.id)
+      const appointment = await Appointment.query()
+        .where('id', ctx.params.id)
+        .preload('branch')
+        .firstOrFail()
 
       await ctx.bouncer.with(AppointmentPolicy).authorize('restore', appointment)
 

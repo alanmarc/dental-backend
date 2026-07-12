@@ -11,7 +11,10 @@ import User from '#models/user'
 export default class UpdateAppointmentsController {
   public async handle(ctx: HttpContext) {
     try {
-      const appointment = await Appointment.findOrFail(ctx.params.id)
+      const appointment = await Appointment.query()
+        .where('id', ctx.params.id)
+        .preload('branch')
+        .firstOrFail()
       await ctx.bouncer.with(AppointmentPolicy).authorize('update', appointment)
 
       const data = await ctx.request.validateUsing(updateAppointmentValidator)

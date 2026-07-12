@@ -8,7 +8,10 @@ import { handleControllerError } from '#utils/error_handler'
 export default class SoftDeletePrescriptionsController {
   public async handle(ctx: HttpContext) {
     try {
-      const prescription = await Prescription.findOrFail(ctx.params.id)
+      const prescription = await Prescription.query()
+        .where('id', ctx.params.id)
+        .preload('branch')
+        .firstOrFail()
       await ctx.bouncer.with(PrescriptionPolicy).authorize('delete', prescription)
 
       prescription.deletedAt = DateTime.utc()

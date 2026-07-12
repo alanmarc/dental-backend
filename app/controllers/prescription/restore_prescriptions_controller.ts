@@ -7,7 +7,10 @@ import PrescriptionPolicy from '#policies/prescription_policy'
 export default class RestorePrescriptionsController {
   public async handle(ctx: HttpContext) {
     try {
-      const prescription = await Prescription.findOrFail(ctx.params.id)
+      const prescription = await Prescription.query()
+        .where('id', ctx.params.id)
+        .preload('branch')
+        .firstOrFail()
       await ctx.bouncer.with(PrescriptionPolicy).authorize('restore', prescription)
 
       prescription.deletedAt = null

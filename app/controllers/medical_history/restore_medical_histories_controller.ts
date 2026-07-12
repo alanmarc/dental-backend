@@ -7,7 +7,10 @@ import { handleControllerError } from '#utils/error_handler'
 export default class RestoreMedicalHistoriesController {
   public async handle(ctx: HttpContext) {
     try {
-      const medicalHistory = await MedicalHistory.findOrFail(ctx.params.id)
+      const medicalHistory = await MedicalHistory.query()
+        .where('id', ctx.params.id)
+        .preload('branch')
+        .firstOrFail()
       await ctx.bouncer.with(MedicalHistoryPolicy).authorize('restore', medicalHistory)
 
       medicalHistory.deletedAt = null

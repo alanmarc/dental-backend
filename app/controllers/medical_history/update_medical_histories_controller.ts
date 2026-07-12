@@ -9,7 +9,10 @@ import { handlerEmptyRequest } from '#utils/empty_request_handler'
 export default class UpdateMedicalHistoriesController {
   public async handle(ctx: HttpContext) {
     try {
-      const medicalHistory = await MedicalHistory.findOrFail(ctx.params.id)
+      const medicalHistory = await MedicalHistory.query()
+        .where('id', ctx.params.id)
+        .preload('branch')
+        .firstOrFail()
       await ctx.bouncer.with(MedicalHistoryPolicy).authorize('update', medicalHistory)
 
       const data = await ctx.request.validateUsing(updateMedicalHistoriesValidator)

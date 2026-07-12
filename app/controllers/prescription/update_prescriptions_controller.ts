@@ -16,6 +16,7 @@ export default class UpdatePrescriptionsController {
       const prescription = await Prescription.query()
         .where('id', params.id)
         .whereNull('deleted_at')
+        .preload('branch')
         .firstOrFail()
 
       await ctx.bouncer.with(PrescriptionPolicy).authorize('update', prescription)

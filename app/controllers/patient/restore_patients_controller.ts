@@ -7,7 +7,10 @@ import PatientPolicy from '#policies/patient_policy'
 export default class RestorePatientsController {
   public async handle(ctx: HttpContext) {
     try {
-      const patient = await Patient.findOrFail(ctx.params.id)
+      const patient = await Patient.query()
+        .where('id', ctx.params.id)
+        .preload('branch')
+        .firstOrFail()
       await ctx.bouncer.with(PatientPolicy).authorize('restore', patient)
 
       patient.deletedAt = null
