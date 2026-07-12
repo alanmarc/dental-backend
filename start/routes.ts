@@ -16,6 +16,7 @@ import appointments from '../routes/appointments.js'
 import medicalHistories from '../routes/medical_histories.js'
 import hospitals from '../routes/hospitals.js'
 import branches from '../routes/branches.js'
+import prescriptions from '../routes/prescriptions.js'
 
 const { default: AllTokensController } = await import('#controllers/all_tokens_controller')
 const { default: AuthController } = await import('#controllers/auth_controller')
@@ -38,6 +39,7 @@ router
     router.group(medicalHistories).as('medical_histories')
     router.group(hospitals).as('hospitals')
     router.group(branches).as('branches')
+    router.group(prescriptions).as('prescriptions')
   })
   .prefix('api')
   .as('api')

@@ -9,15 +9,18 @@ export default class extends BaseSchema {
       table
         .integer('prescription_id')
         .unsigned()
+        .notNullable()
         .references('id')
         .inTable('prescriptions')
         .onDelete('CASCADE')
       table.string('medication_name').notNullable()
       table.string('dosage').notNullable()
       table.string('frequency').notNullable()
-      table.integer('duration').notNullable()
+      table.integer('duration_days').notNullable()
       table.text('instructions').nullable()
       table.timestamps(true, true)
+
+      table.index('prescription_id')
     })
   }
 

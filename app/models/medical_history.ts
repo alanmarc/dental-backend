@@ -1,10 +1,11 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import User from '#models/user'
 import Patient from '#models/patient'
 import Appointment from '#models/appointment'
 import Branch from './branch.js'
+import Prescription from '#models/prescription'
 
 export default class MedicalHistory extends BaseModel {
   @column({ isPrimary: true })
@@ -17,7 +18,7 @@ export default class MedicalHistory extends BaseModel {
   declare patientId: number
 
   @column()
-  declare appointmentId: number
+  declare appointmentId: number | null
 
   @column()
   declare branchId: number
@@ -55,4 +56,7 @@ export default class MedicalHistory extends BaseModel {
   // Relación con la sucursal
   @belongsTo(() => Branch)
   declare branch: BelongsTo<typeof Branch>
+
+  @hasMany(() => Prescription)
+  declare prescriptions: HasMany<typeof Prescription>
 }

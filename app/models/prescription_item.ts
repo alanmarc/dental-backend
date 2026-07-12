@@ -19,8 +19,8 @@ export default class PrescriptionItem extends BaseModel {
   @column()
   declare frequency: string
 
-  @column()
-  declare duration: number
+  @column({ columnName: 'duration_days' })
+  declare durationDays: number
 
   @column()
   declare instructions: string | null

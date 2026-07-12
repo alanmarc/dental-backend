@@ -31,12 +31,12 @@ test.group('Appointments update', (group) => {
     response.assertStatus(403)
   })
 
-  test('200 si el actor tiene appointments.update.any y edita cualquier cita', async ({
+  test('200 si el actor tiene appointments.update.any y edita cualquier cita del mismo hospital', async ({
     client,
     assert,
   }) => {
     const actor = await createUserWithPermissions(['appointments.update.any'])
-    const otherDoctor = await createUserWithPermissions([])
+    const otherDoctor = await createUserWithPermissions([], actor.branchId)
     const patient = await PatientFactory.merge({
       userId: otherDoctor.id,
       branchId: otherDoctor.branchId,
@@ -54,6 +54,29 @@ test.group('Appointments update', (group) => {
 
     response.assertStatus(200)
     assert.equal(response.body().data.reason, 'Editado por admin')
+  })
+
+  test('403 si el actor tiene appointments.update.any pero intenta editar cita de otro hospital', async ({
+    client,
+  }) => {
+    const actor = await createUserWithPermissions(['appointments.update.any'])
+    const otherDoctor = await createUserWithPermissions([])
+    const patient = await PatientFactory.merge({
+      userId: otherDoctor.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+    const target = await AppointmentFactory.merge({
+      userId: otherDoctor.id,
+      patientId: patient.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+
+    const response = await client
+      .put(`/api/appointments/${target.id}`)
+      .loginAs(actor)
+      .json({ reason: 'Editado por admin de otro hospital' })
+
+    response.assertStatus(403)
   })
 
   test('200 si el actor tiene appointments.update.own y edita SU propia cita', async ({
@@ -104,7 +127,6 @@ test.group('Appointments update', (group) => {
   })
 
   test('422 si se intenta actualizar el doctor a uno de otra sucursal', async ({ client }) => {
-    const actor = await createUserWithPermissions(['appointments.update.any'])
     const doctorRole = await Role.firstOrCreate({ name: 'doctor' }, { name: 'doctor' })
 
     const hospital = await Hospital.create({ name: 'Test Hospital' })
@@ -115,6 +137,7 @@ test.group('Appointments update', (group) => {
       email: 'a@test.com',
       address: 'Calle A',
     })
+    const actor = await createUserWithPermissions(['appointments.update.any'], branchA.id)
     const branchB = await Branch.create({
       hospitalId: hospital.id,
       name: 'Sucursal B',
@@ -153,9 +176,7 @@ test.group('Appointments update', (group) => {
     response.assertStatus(422)
     response.assertTextIncludes('El paciente y el doctor pertenecen a sucursales distintas')
   })
-
   test('422 si se intenta actualizar el paciente a uno de otra sucursal', async ({ client }) => {
-    const actor = await createUserWithPermissions(['appointments.update.any'])
     const doctorRole = await Role.firstOrCreate({ name: 'doctor' }, { name: 'doctor' })
 
     const hospital = await Hospital.create({ name: 'Test Hospital' })
@@ -166,6 +187,7 @@ test.group('Appointments update', (group) => {
       email: 'a@test.com',
       address: 'Calle A',
     })
+    const actor = await createUserWithPermissions(['appointments.update.any'], branchA.id)
     const branchB = await Branch.create({
       hospitalId: hospital.id,
       name: 'Sucursal B',

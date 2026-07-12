@@ -12,23 +12,45 @@ export default class extends BaseSchema {
         .notNullable()
         .references('id')
         .inTable('users')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
       table
         .integer('patient_id')
         .unsigned()
         .notNullable()
         .references('id')
         .inTable('patients')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
       table
         .integer('appointment_id')
         .unsigned()
+        .nullable()
         .references('id')
         .inTable('appointments')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
+      table
+        .integer('medical_history_id')
+        .unsigned()
+        .nullable()
+        .references('id')
+        .inTable('medical_histories')
+        .onDelete('RESTRICT')
+      table
+        .integer('branch_id')
+        .unsigned()
+        .notNullable()
+        .references('id')
+        .inTable('branches')
+        .onDelete('RESTRICT')
       table.text('notes').nullable()
+      table.timestamp('deleted_at', { useTz: true }).nullable()
 
       table.timestamps(true, true)
+
+      table.index(['branch_id', 'deleted_at'])
+      table.index('patient_id')
+      table.index('user_id')
+      table.index('appointment_id')
+      table.index('medical_history_id')
     })
   }
 

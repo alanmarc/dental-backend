@@ -23,12 +23,12 @@ test.group('Patients update', (group) => {
     response.assertStatus(403)
   })
 
-  test('200 si el actor tiene patients.update.any y edita cualquier paciente', async ({
+  test('200 si el actor tiene patients.update.any y edita cualquier paciente del mismo hospital', async ({
     client,
     assert,
   }) => {
     const actor = await createUserWithPermissions(['patients.update.any'])
-    const otherUser = await createUserWithPermissions([])
+    const otherUser = await createUserWithPermissions([], actor.branchId)
     const target = await PatientFactory.merge({
       userId: otherUser.id,
       branchId: otherUser.branchId,
@@ -41,6 +41,24 @@ test.group('Patients update', (group) => {
 
     response.assertStatus(200)
     assert.equal(response.body().data.firstName, 'Nombre Nuevo')
+  })
+
+  test('403 si el actor tiene patients.update.any pero intenta editar un paciente de otro hospital', async ({
+    client,
+  }) => {
+    const actor = await createUserWithPermissions(['patients.update.any'])
+    const otherUser = await createUserWithPermissions([])
+    const target = await PatientFactory.merge({
+      userId: otherUser.id,
+      branchId: otherUser.branchId,
+    }).create()
+
+    const response = await client
+      .put(`/api/patients/${target.id}`)
+      .loginAs(actor)
+      .json({ firstName: 'Intento de Hack' })
+
+    response.assertStatus(403)
   })
 
   test('200 si el actor tiene patients.update.own y edita SU propio paciente', async ({

@@ -24,9 +24,12 @@ test.group('Appointments delete/restore', (group) => {
     response.assertStatus(403)
   })
 
-  test('200 y hace soft delete si tiene appointments.delete.any', async ({ client, assert }) => {
+  test('200 y hace soft delete si tiene appointments.delete.any y es del mismo hospital', async ({
+    client,
+    assert,
+  }) => {
     const actor = await createUserWithPermissions(['appointments.delete.any'])
-    const otherDoctor = await createUserWithPermissions([])
+    const otherDoctor = await createUserWithPermissions([], actor.branchId)
     const patient = await PatientFactory.merge({
       userId: otherDoctor.id,
       branchId: otherDoctor.branchId,
@@ -40,6 +43,25 @@ test.group('Appointments delete/restore', (group) => {
     const response = await client.delete(`/api/appointments/${target.id}`).loginAs(actor)
     response.assertStatus(200)
     assert.isNotNull(response.body().data.deletedAt)
+  })
+
+  test('403 si el actor tiene appointments.delete.any pero intenta eliminar cita de otro hospital', async ({
+    client,
+  }) => {
+    const actor = await createUserWithPermissions(['appointments.delete.any'])
+    const otherDoctor = await createUserWithPermissions([])
+    const patient = await PatientFactory.merge({
+      userId: otherDoctor.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+    const target = await AppointmentFactory.merge({
+      userId: otherDoctor.id,
+      patientId: patient.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+
+    const response = await client.delete(`/api/appointments/${target.id}`).loginAs(actor)
+    response.assertStatus(403)
   })
 
   test('200 y hace soft delete si tiene appointments.delete.own y es su cita', async ({
@@ -98,12 +120,15 @@ test.group('Appointments delete/restore', (group) => {
     response.assertStatus(403)
   })
 
-  test('200 y restaura si tiene appointments.restore.any', async ({ client, assert }) => {
+  test('200 y restaura si tiene appointments.restore.any y es del mismo hospital', async ({
+    client,
+    assert,
+  }) => {
     const actor = await createUserWithPermissions([
       'appointments.delete.any',
       'appointments.restore.any',
     ])
-    const otherDoctor = await createUserWithPermissions([])
+    const otherDoctor = await createUserWithPermissions([], actor.branchId)
     const patient = await PatientFactory.merge({
       userId: otherDoctor.id,
       branchId: otherDoctor.branchId,
@@ -120,6 +145,35 @@ test.group('Appointments delete/restore', (group) => {
     const response = await client.put(`/api/appointments/${target.id}/restore`).loginAs(actor)
     response.assertStatus(200)
     assert.isNull(response.body().data.deletedAt)
+  })
+
+  test('403 si el actor tiene appointments.restore.any pero intenta restaurar cita de otro hospital', async ({
+    client,
+  }) => {
+    const actor = await createUserWithPermissions([
+      'appointments.delete.any',
+      'appointments.restore.any',
+    ])
+    const otherDoctor = await createUserWithPermissions([]) // different hospital
+    const patient = await PatientFactory.merge({
+      userId: otherDoctor.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+    const target = await AppointmentFactory.merge({
+      userId: otherDoctor.id,
+      patientId: patient.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+
+    // Soft-delete target using a deleter in the other hospital
+    const deleter = await createUserWithPermissions(
+      ['appointments.delete.any'],
+      otherDoctor.branchId
+    )
+    await client.delete(`/api/appointments/${target.id}`).loginAs(deleter)
+
+    const response = await client.put(`/api/appointments/${target.id}/restore`).loginAs(actor)
+    response.assertStatus(403)
   })
 
   test('200 y restaura si tiene appointments.restore.own y es su cita', async ({
@@ -155,7 +209,7 @@ test.group('Appointments delete/restore', (group) => {
       'appointments.delete.any',
       'appointments.restore.own',
     ])
-    const otherDoctor = await createUserWithPermissions([])
+    const otherDoctor = await createUserWithPermissions([], actor.branchId)
     const patient = await PatientFactory.merge({
       userId: otherDoctor.id,
       branchId: otherDoctor.branchId,

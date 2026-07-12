@@ -3,7 +3,7 @@ import User from '#models/user'
 import MedicalHistory from '#models/medical_history'
 import { AuthorizerResponse } from '@adonisjs/bouncer/types'
 
-export default class MedicalHistoriePolicy extends BasePolicy {
+export default class MedicalHistoryPolicy extends BasePolicy {
   async view(actor: User): Promise<AuthorizerResponse> {
     return actor.hasPermission('medical_histories.view')
   }
@@ -13,7 +13,12 @@ export default class MedicalHistoriePolicy extends BasePolicy {
   }
 
   async update(actor: User, history: MedicalHistory): Promise<AuthorizerResponse> {
-    if (actor.hasPermission('medical_histories.update.any')) return true
+    if (actor.hasPermission('medical_histories.update.any')) {
+      if (!history.branch) {
+        await history.load('branch')
+      }
+      return actor.branch.hospitalId === history.branch.hospitalId
+    }
     if (actor.hasPermission('medical_histories.update.own')) {
       return history.userId === actor.id
     }
@@ -21,7 +26,12 @@ export default class MedicalHistoriePolicy extends BasePolicy {
   }
 
   async delete(actor: User, history: MedicalHistory): Promise<AuthorizerResponse> {
-    if (actor.hasPermission('medical_histories.delete.any')) return true
+    if (actor.hasPermission('medical_histories.delete.any')) {
+      if (!history.branch) {
+        await history.load('branch')
+      }
+      return actor.branch.hospitalId === history.branch.hospitalId
+    }
     if (actor.hasPermission('medical_histories.delete.own')) {
       return history.userId === actor.id
     }
@@ -29,7 +39,12 @@ export default class MedicalHistoriePolicy extends BasePolicy {
   }
 
   async restore(actor: User, history: MedicalHistory): Promise<AuthorizerResponse> {
-    if (actor.hasPermission('medical_histories.restore.any')) return true
+    if (actor.hasPermission('medical_histories.restore.any')) {
+      if (!history.branch) {
+        await history.load('branch')
+      }
+      return actor.branch.hospitalId === history.branch.hospitalId
+    }
     if (actor.hasPermission('medical_histories.restore.own')) {
       return history.userId === actor.id
     }

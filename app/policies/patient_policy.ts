@@ -13,7 +13,12 @@ export default class PatientPolicy extends BasePolicy {
   }
 
   async update(actor: User, patient: Patient): Promise<AuthorizerResponse> {
-    if (actor.hasPermission('patients.update.any')) return true
+    if (actor.hasPermission('patients.update.any')) {
+      if (!patient.branch) {
+        await patient.load('branch')
+      }
+      return actor.branch.hospitalId === patient.branch.hospitalId
+    }
     if (actor.hasPermission('patients.update.own')) {
       return patient.userId === actor.id
     }
@@ -21,7 +26,12 @@ export default class PatientPolicy extends BasePolicy {
   }
 
   async delete(actor: User, patient: Patient): Promise<AuthorizerResponse> {
-    if (actor.hasPermission('patients.delete.any')) return true
+    if (actor.hasPermission('patients.delete.any')) {
+      if (!patient.branch) {
+        await patient.load('branch')
+      }
+      return actor.branch.hospitalId === patient.branch.hospitalId
+    }
     if (actor.hasPermission('patients.delete.own')) {
       return patient.userId === actor.id
     }
@@ -29,7 +39,12 @@ export default class PatientPolicy extends BasePolicy {
   }
 
   async restore(actor: User, patient: Patient): Promise<AuthorizerResponse> {
-    if (actor.hasPermission('patients.restore.any')) return true
+    if (actor.hasPermission('patients.restore.any')) {
+      if (!patient.branch) {
+        await patient.load('branch')
+      }
+      return actor.branch.hospitalId === patient.branch.hospitalId
+    }
     if (actor.hasPermission('patients.restore.own')) {
       return patient.userId === actor.id
     }

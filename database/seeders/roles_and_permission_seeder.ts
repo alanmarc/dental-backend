@@ -21,6 +21,7 @@ export default class RolesAndPermissionsSeeder extends BaseSeeder {
             PERMISSIONS.appointments.viewAny,
             PERMISSIONS.medicalHistories.viewAny,
             PERMISSIONS.branches.viewAny,
+            PERMISSIONS.prescriptions.viewAny,
           ],
           permByName
         )
@@ -52,6 +53,12 @@ export default class RolesAndPermissionsSeeder extends BaseSeeder {
             PERMISSIONS.medicalHistories.updateAny,
             PERMISSIONS.medicalHistories.deleteAny,
             PERMISSIONS.medicalHistories.restoreAny,
+            PERMISSIONS.prescriptions.view,
+            PERMISSIONS.prescriptions.viewAny,
+            PERMISSIONS.prescriptions.create,
+            PERMISSIONS.prescriptions.updateAny,
+            PERMISSIONS.prescriptions.deleteAny,
+            PERMISSIONS.prescriptions.restoreAny,
             PERMISSIONS.branches.view,
             PERMISSIONS.branches.createOwn,
             PERMISSIONS.branches.updateOwn,
@@ -82,6 +89,11 @@ export default class RolesAndPermissionsSeeder extends BaseSeeder {
             PERMISSIONS.medicalHistories.updateOwn,
             PERMISSIONS.medicalHistories.deleteOwn,
             PERMISSIONS.medicalHistories.restoreOwn,
+            PERMISSIONS.prescriptions.view,
+            PERMISSIONS.prescriptions.create,
+            PERMISSIONS.prescriptions.updateOwn,
+            PERMISSIONS.prescriptions.deleteOwn,
+            PERMISSIONS.prescriptions.restoreOwn,
           ],
           permByName
         )

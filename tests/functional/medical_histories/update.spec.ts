@@ -36,12 +36,12 @@ test.group('Medical histories update', (group) => {
     response.assertStatus(403)
   })
 
-  test('200 si el actor tiene medical_histories.update.any y edita cualquier historial', async ({
+  test('200 si el actor tiene medical_histories.update.any y edita cualquier historial del mismo hospital', async ({
     client,
     assert,
   }) => {
     const actor = await createUserWithPermissions(['medical_histories.update.any'])
-    const otherDoctor = await createUserWithPermissions([])
+    const otherDoctor = await createUserWithPermissions([], actor.branchId)
     const patient = await PatientFactory.merge({
       userId: otherDoctor.id,
       branchId: otherDoctor.branchId,
@@ -65,6 +65,35 @@ test.group('Medical histories update', (group) => {
 
     response.assertStatus(200)
     assert.equal(response.body().data.diagnosis, 'Editado por admin')
+  })
+
+  test('403 si el actor tiene medical_histories.update.any pero intenta editar un historial de otro hospital', async ({
+    client,
+  }) => {
+    const actor = await createUserWithPermissions(['medical_histories.update.any'])
+    const otherDoctor = await createUserWithPermissions([])
+    const patient = await PatientFactory.merge({
+      userId: otherDoctor.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+    const appointment = await AppointmentFactory.merge({
+      userId: otherDoctor.id,
+      patientId: patient.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+    const target = await MedicalHistoryFactory.merge({
+      userId: otherDoctor.id,
+      patientId: patient.id,
+      appointmentId: appointment.id,
+      branchId: otherDoctor.branchId,
+    }).create()
+
+    const response = await client
+      .put(`/api/medical_histories/${target.id}`)
+      .loginAs(actor)
+      .json({ diagnosis: 'Editado por admin de otro hospital' })
+
+    response.assertStatus(403)
   })
 
   test('200 si el actor tiene medical_histories.update.own y edita SU propio historial', async ({

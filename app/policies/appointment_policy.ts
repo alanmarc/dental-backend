@@ -13,7 +13,12 @@ export default class AppointmentPolicy extends BasePolicy {
   }
 
   async update(actor: User, appointment: Appointment): Promise<AuthorizerResponse> {
-    if (actor.hasPermission('appointments.update.any')) return true
+    if (actor.hasPermission('appointments.update.any')) {
+      if (!appointment.branch) {
+        await appointment.load('branch')
+      }
+      return actor.branch.hospitalId === appointment.branch.hospitalId
+    }
     if (actor.hasPermission('appointments.update.own')) {
       return appointment.userId === actor.id
     }
@@ -21,7 +26,12 @@ export default class AppointmentPolicy extends BasePolicy {
   }
 
   async delete(actor: User, appointment: Appointment): Promise<AuthorizerResponse> {
-    if (actor.hasPermission('appointments.delete.any')) return true
+    if (actor.hasPermission('appointments.delete.any')) {
+      if (!appointment.branch) {
+        await appointment.load('branch')
+      }
+      return actor.branch.hospitalId === appointment.branch.hospitalId
+    }
     if (actor.hasPermission('appointments.delete.own')) {
       return appointment.userId === actor.id
     }
@@ -29,7 +39,12 @@ export default class AppointmentPolicy extends BasePolicy {
   }
 
   async restore(actor: User, appointment: Appointment): Promise<AuthorizerResponse> {
-    if (actor.hasPermission('appointments.restore.any')) return true
+    if (actor.hasPermission('appointments.restore.any')) {
+      if (!appointment.branch) {
+        await appointment.load('branch')
+      }
+      return actor.branch.hospitalId === appointment.branch.hospitalId
+    }
     if (actor.hasPermission('appointments.restore.own')) {
       return appointment.userId === actor.id
     }
