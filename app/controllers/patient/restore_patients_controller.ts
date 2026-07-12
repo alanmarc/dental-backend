@@ -1,7 +1,7 @@
 import Patient from '#models/patient'
 import type { HttpContext } from '@adonisjs/core/http'
-import ApiResponse from '../../utils/api_response.js'
-import { handleControllerError } from '../../utils/error_handler.js'
+import ApiResponse from '#utils/api_response'
+import { handleControllerError } from '#utils/error_handler'
 import PatientPolicy from '#policies/patient_policy'
 
 export default class RestorePatientsController {

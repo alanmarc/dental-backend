@@ -1,10 +1,10 @@
 import User from '#models/user'
 import { HttpContext } from '@adonisjs/core/http'
-import ApiResponse from '../../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 import UserPolicy from '#policies/user_policy'
-import { handleControllerError } from '../../utils/error_handler.js'
+import { handleControllerError } from '#utils/error_handler'
 
-import { getBranchIdsForActorHospital } from '../../services/scope_service.js'
+import { getBranchIdsForActorHospital } from '#services/scope_service'
 
 export default class IndexUsersController {
   public async handle(ctx: HttpContext) {
@@ -16,7 +16,7 @@ export default class IndexUsersController {
 
       await ctx.bouncer.with(UserPolicy).authorize('view')
 
-      const query = User.query()
+      const query = User.query().whereNull('deleted_at')
 
       // Enforce multi-tenant scoping if not super_admin
       if (!actor.hasPermission('users.view.any')) {

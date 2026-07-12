@@ -1,10 +1,10 @@
 import Patient from '#models/patient'
 import type { HttpContext } from '@adonisjs/core/http'
-import ApiResponse from '../../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 import PatientPolicy from '#policies/patient_policy'
-import { handleControllerError } from '../../utils/error_handler.js'
+import { handleControllerError } from '#utils/error_handler'
 
-import { getBranchIdsForActorHospital } from '../../services/scope_service.js'
+import { getBranchIdsForActorHospital } from '#services/scope_service'
 
 export default class IndexPatientsController {
   public async handle(ctx: HttpContext) {
@@ -16,7 +16,7 @@ export default class IndexPatientsController {
 
       await ctx.bouncer.with(PatientPolicy).authorize('view')
 
-      const query = Patient.query()
+      const query = Patient.query().whereNull('deleted_at')
 
       // Enforce hospital scoping
       if (!actor.hasPermission('patients.view.any')) {

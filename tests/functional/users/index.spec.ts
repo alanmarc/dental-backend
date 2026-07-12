@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { createUserWithPermissions } from '#tests/helpers/permissions'
 import { UserFactory } from '#database/factories/user_factory'
+import { DateTime } from 'luxon'
 
 test.group('Users index', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
@@ -57,5 +58,26 @@ test.group('Users index', (group) => {
     const ids = response.body().data.map((u: any) => u.id)
     assert.include(ids, actor.id)
     assert.include(ids, otherDoctor.id)
+  })
+
+  test('200 y excluye usuarios soft-eliminados', async ({ client, assert }) => {
+    const actor = await createUserWithPermissions(['users.view'])
+
+    // Crear otro usuario en la misma sucursal
+    const otherUser = await UserFactory.merge({
+      roleId: actor.roleId,
+      branchId: actor.branchId,
+    }).create()
+
+    // Soft-eliminar otherUser
+    otherUser.deletedAt = DateTime.utc()
+    await otherUser.save()
+
+    const response = await client.get('/api/users').loginAs(actor)
+
+    response.assertStatus(200)
+    const ids = response.body().data.map((u: any) => u.id)
+    assert.include(ids, actor.id)
+    assert.notInclude(ids, otherUser.id)
   })
 })

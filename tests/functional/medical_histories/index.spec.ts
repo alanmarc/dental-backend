@@ -4,6 +4,7 @@ import { createUserWithPermissions } from '#tests/helpers/permissions'
 import { PatientFactory } from '#database/factories/patient_factory'
 import { AppointmentFactory } from '#database/factories/appointment_factory'
 import { MedicalHistoryFactory } from '#database/factories/medical_history_factory'
+import { DateTime } from 'luxon'
 
 test.group('Medical histories index', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
@@ -26,20 +27,17 @@ test.group('Medical histories index', (group) => {
       branchId: actor.branchId,
     }).create()
 
-    // Crear historiales de prueba de forma secuencial para evitar advertencias de pg concurrente
-    for (let i = 0; i < 15; i++) {
-      await MedicalHistoryFactory.merge({
-        userId: actor.id,
-        patientId: patient.id,
-        appointmentId: appointment.id,
-        branchId: actor.branchId,
-      }).create()
-    }
+    await MedicalHistoryFactory.merge({
+      userId: actor.id,
+      patientId: patient.id,
+      appointmentId: appointment.id,
+      branchId: actor.branchId,
+    }).createMany(5)
 
-    const response = await client.get('/api/medical_histories?page=1&limit=5').loginAs(actor)
+    const response = await client.get('/api/medical_histories?page=1&limit=2').loginAs(actor)
 
     response.assertStatus(200)
-    assert.lengthOf(response.body().data, 5)
+    assert.lengthOf(response.body().data, 2)
   })
 
   test('200 y filtra por hospital si es admin con medical_histories.view', async ({
@@ -123,5 +121,44 @@ test.group('Medical histories index', (group) => {
     response.assertStatus(200)
     const ids = response.body().data.map((h: any) => h.id)
     assert.include(ids, otherHistory.id)
+  })
+
+  test('200 y excluye historiales médicos soft-eliminados', async ({ client, assert }) => {
+    const actor = await createUserWithPermissions(['medical_histories.view'])
+    const patient = await PatientFactory.merge({
+      userId: actor.id,
+      branchId: actor.branchId,
+    }).create()
+
+    const appointment = await AppointmentFactory.merge({
+      userId: actor.id,
+      patientId: patient.id,
+      branchId: actor.branchId,
+    }).create()
+
+    const historyA = await MedicalHistoryFactory.merge({
+      userId: actor.id,
+      patientId: patient.id,
+      appointmentId: appointment.id,
+      branchId: actor.branchId,
+    }).create()
+
+    const historyB = await MedicalHistoryFactory.merge({
+      userId: actor.id,
+      patientId: patient.id,
+      appointmentId: appointment.id,
+      branchId: actor.branchId,
+    }).create()
+
+    // Soft-eliminar historyB
+    historyB.deletedAt = DateTime.utc()
+    await historyB.save()
+
+    const response = await client.get('/api/medical_histories').loginAs(actor)
+
+    response.assertStatus(200)
+    const ids = response.body().data.map((h: any) => h.id)
+    assert.include(ids, historyA.id)
+    assert.notInclude(ids, historyB.id)
   })
 })

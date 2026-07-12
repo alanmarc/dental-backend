@@ -1,10 +1,10 @@
 import Appointment from '#models/appointment'
 import { updateAppointmentValidator } from '#validators/appointment/update_appointment_validator'
 import type { HttpContext } from '@adonisjs/core/http'
-import ApiResponse from '../../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 import AppointmentPolicy from '#policies/appointment_policy'
-import { handleControllerError } from '../../utils/error_handler.js'
-import { isAppointmentAvailable } from '../../utils/validate_availability.js'
+import { handleControllerError } from '#utils/error_handler'
+import { isAppointmentAvailable } from '#utils/validate_availability'
 import Patient from '#models/patient'
 import User from '#models/user'
 

@@ -1,10 +1,10 @@
 import Appointment from '#models/appointment'
 import type { HttpContext } from '@adonisjs/core/http'
-import ApiResponse from '../../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 import AppointmentPolicy from '#policies/appointment_policy'
-import { handleControllerError } from '../../utils/error_handler.js'
+import { handleControllerError } from '#utils/error_handler'
 
-import { getBranchIdsForActorHospital } from '../../services/scope_service.js'
+import { getBranchIdsForActorHospital } from '#services/scope_service'
 
 export default class IndexAppointmentsController {
   public async handle(ctx: HttpContext) {
@@ -17,7 +17,7 @@ export default class IndexAppointmentsController {
       const actor = ctx.auth.user!
 
       // Inicia la consulta
-      const query = Appointment.query()
+      const query = Appointment.query().whereNull('deleted_at')
 
       // Aplica el filtro si existe
       if (status) {

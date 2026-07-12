@@ -1,9 +1,9 @@
 import Patient from '#models/patient'
 import { storePatientValidator } from '#validators/patient/store_patient_validator'
 import type { HttpContext } from '@adonisjs/core/http'
-import ApiResponse from '../../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 import PatientPolicy from '#policies/patient_policy'
-import { handleControllerError } from '../../utils/error_handler.js'
+import { handleControllerError } from '#utils/error_handler'
 import { DateTime } from 'luxon'
 import User from '#models/user'
 

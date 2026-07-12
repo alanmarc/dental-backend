@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { createUserWithPermissions } from '#tests/helpers/permissions'
 import { PatientFactory } from '#database/factories/patient_factory'
+import { DateTime } from 'luxon'
 
 test.group('Patients index', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
@@ -65,5 +66,29 @@ test.group('Patients index', (group) => {
     response.assertStatus(200)
     const ids = response.body().data.map((p: any) => p.id)
     assert.include(ids, otherPatient.id)
+  })
+
+  test('200 y excluye pacientes soft-eliminados', async ({ client, assert }) => {
+    const actor = await createUserWithPermissions(['patients.view'])
+
+    const patientA = await PatientFactory.merge({
+      userId: actor.id,
+      branchId: actor.branchId,
+    }).create()
+    const patientB = await PatientFactory.merge({
+      userId: actor.id,
+      branchId: actor.branchId,
+    }).create()
+
+    // Soft-eliminar patientB
+    patientB.deletedAt = DateTime.utc()
+    await patientB.save()
+
+    const response = await client.get('/api/patients').loginAs(actor)
+
+    response.assertStatus(200)
+    const ids = response.body().data.map((p: any) => p.id)
+    assert.include(ids, patientA.id)
+    assert.notInclude(ids, patientB.id)
   })
 })

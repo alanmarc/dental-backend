@@ -2,7 +2,7 @@ import User from '#models/user'
 import { HttpContext } from '@adonisjs/core/http'
 import { loginValidator } from '#validators/login'
 import hash from '@adonisjs/core/services/hash'
-import ApiResponse from '../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 
 export default class AuthController {
   public async login(ctx: HttpContext) {

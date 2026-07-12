@@ -1,9 +1,9 @@
 import MedicalHistory from '#models/medical_history'
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
-import ApiResponse from '../../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 import MedicalHistoriePolicy from '#policies/medical_historie_policy'
-import { handleControllerError } from '../../utils/error_handler.js'
+import { handleControllerError } from '#utils/error_handler'
 
 export default class SoftDeleteMedicalHistoriesController {
   public async handle(ctx: HttpContext) {

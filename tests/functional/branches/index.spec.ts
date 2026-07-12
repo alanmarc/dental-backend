@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { createUserWithPermissions, createBranch } from '#tests/helpers/permissions'
 import Hospital from '#models/hospital'
+import { DateTime } from 'luxon'
 
 test.group('Branches index', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
@@ -51,5 +52,24 @@ test.group('Branches index', (group) => {
     const branchIds = response.body().data.map((b: any) => b.id)
     assert.include(branchIds, branchA.id)
     assert.include(branchIds, branchB.id)
+  })
+
+  test('200 y excluye sucursales soft-eliminadas', async ({ client, assert }) => {
+    const hospital = await Hospital.create({ name: 'Hospital Test' })
+    const branchA = await createBranch(hospital.id)
+    const branchB = await createBranch(hospital.id)
+
+    // Soft-eliminar branchB
+    branchB.deletedAt = DateTime.utc()
+    await branchB.save()
+
+    const actor = await createUserWithPermissions(['branches.view'], branchA.id)
+
+    const response = await client.get('/api/branches').loginAs(actor)
+
+    response.assertStatus(200)
+    const branchIds = response.body().data.map((b: any) => b.id)
+    assert.include(branchIds, branchA.id)
+    assert.notInclude(branchIds, branchB.id)
   })
 })

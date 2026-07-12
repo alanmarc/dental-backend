@@ -1,8 +1,8 @@
 import Branch from '#models/branch'
 import type { HttpContext } from '@adonisjs/core/http'
-import ApiResponse from '../../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 import BranchPolicy from '#policies/branch_policy'
-import { handleControllerError } from '../../utils/error_handler.js'
+import { handleControllerError } from '#utils/error_handler'
 import { DateTime } from 'luxon'
 
 export default class SoftDeleteBranchesController {

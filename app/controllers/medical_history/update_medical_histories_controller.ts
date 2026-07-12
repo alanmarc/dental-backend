@@ -2,9 +2,9 @@ import MedicalHistory from '#models/medical_history'
 import type { HttpContext } from '@adonisjs/core/http'
 import MedicalHistoriePolicy from '#policies/medical_historie_policy'
 import { updateMedicalHistoriesValidator } from '#validators/medical_historie/update_medical_histories_validator'
-import { handleControllerError } from '../../utils/error_handler.js'
-import ApiResponse from '../../utils/api_response.js'
-import { handlerEmptyRequest } from '../../utils/empty_request_handler.js'
+import { handleControllerError } from '#utils/error_handler'
+import ApiResponse from '#utils/api_response'
+import { handlerEmptyRequest } from '#utils/empty_request_handler'
 
 export default class UpdateMedicalHistoriesController {
   public async handle(ctx: HttpContext) {

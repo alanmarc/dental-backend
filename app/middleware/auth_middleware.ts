@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import type { Authenticators } from '@adonisjs/auth/types'
-import ApiResponse from '../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 
 export default class AuthMiddleware {
   /**

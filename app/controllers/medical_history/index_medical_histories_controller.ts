@@ -1,10 +1,10 @@
 import MedicalHistoriePolicy from '#policies/medical_historie_policy'
 import type { HttpContext } from '@adonisjs/core/http'
-import ApiResponse from '../../utils/api_response.js'
-import { handleControllerError } from '../../utils/error_handler.js'
+import ApiResponse from '#utils/api_response'
+import { handleControllerError } from '#utils/error_handler'
 import MedicalHistory from '#models/medical_history'
 
-import { getBranchIdsForActorHospital } from '../../services/scope_service.js'
+import { getBranchIdsForActorHospital } from '#services/scope_service'
 
 export default class IndexMedicalHistoriesController {
   public async handle(ctx: HttpContext) {
@@ -15,7 +15,7 @@ export default class IndexMedicalHistoriesController {
       const limit = ctx.request.input('limit', 10)
       const actor = ctx.auth.user!
 
-      const query = MedicalHistory.query()
+      const query = MedicalHistory.query().whereNull('deleted_at')
 
       // Enforce hospital scoping
       if (!actor.hasPermission('medical_histories.view.any')) {

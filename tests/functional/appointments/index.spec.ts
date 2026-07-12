@@ -3,6 +3,7 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import { createUserWithPermissions } from '#tests/helpers/permissions'
 import { AppointmentFactory } from '#database/factories/appointment_factory'
 import { PatientFactory } from '#database/factories/patient_factory'
+import { DateTime } from 'luxon'
 
 test.group('Appointments index', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
@@ -20,19 +21,16 @@ test.group('Appointments index', (group) => {
       branchId: actor.branchId,
     }).create()
 
-    // Crear algunas citas de prueba de forma secuencial para evitar advertencias de pg concurrente
-    for (let i = 0; i < 15; i++) {
-      await AppointmentFactory.merge({
-        userId: actor.id,
-        patientId: patient.id,
-        branchId: actor.branchId,
-      }).create()
-    }
+    await AppointmentFactory.merge({
+      userId: actor.id,
+      patientId: patient.id,
+      branchId: actor.branchId,
+    }).createMany(5)
 
-    const response = await client.get('/api/appointments?page=1&limit=5').loginAs(actor)
+    const response = await client.get('/api/appointments?page=1&limit=2').loginAs(actor)
 
     response.assertStatus(200)
-    assert.lengthOf(response.body().data, 5)
+    assert.lengthOf(response.body().data, 2)
   })
 
   test('200 y filtra por hospital si es admin con appointments.view', async ({
@@ -92,5 +90,36 @@ test.group('Appointments index', (group) => {
     response.assertStatus(200)
     const ids = response.body().data.map((a: any) => a.id)
     assert.include(ids, otherAppointment.id)
+  })
+
+  test('200 y excluye citas soft-eliminadas', async ({ client, assert }) => {
+    const actor = await createUserWithPermissions(['appointments.view'])
+    const patient = await PatientFactory.merge({
+      userId: actor.id,
+      branchId: actor.branchId,
+    }).create()
+
+    const appointmentA = await AppointmentFactory.merge({
+      userId: actor.id,
+      patientId: patient.id,
+      branchId: actor.branchId,
+    }).create()
+
+    const appointmentB = await AppointmentFactory.merge({
+      userId: actor.id,
+      patientId: patient.id,
+      branchId: actor.branchId,
+    }).create()
+
+    // Soft-eliminar appointmentB
+    appointmentB.deletedAt = DateTime.utc()
+    await appointmentB.save()
+
+    const response = await client.get('/api/appointments').loginAs(actor)
+
+    response.assertStatus(200)
+    const ids = response.body().data.map((a: any) => a.id)
+    assert.include(ids, appointmentA.id)
+    assert.notInclude(ids, appointmentB.id)
   })
 })

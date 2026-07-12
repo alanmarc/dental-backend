@@ -1,9 +1,9 @@
 import Hospital from '#models/hospital'
 import type { HttpContext } from '@adonisjs/core/http'
-import ApiResponse from '../../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 import HospitalPolicy from '#policies/hospital_policy'
 import { storeHospitalValidator } from '#validators/hospital/store_hospital_validator'
-import { handleControllerError } from '../../utils/error_handler.js'
+import { handleControllerError } from '#utils/error_handler'
 
 export default class StoreHospitalsController {
   public async handle(ctx: HttpContext) {

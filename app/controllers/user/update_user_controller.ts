@@ -1,9 +1,9 @@
 import User from '#models/user'
 import { updateUserValidator } from '#validators/update_user_validator'
 import type { HttpContext } from '@adonisjs/core/http'
-import ApiResponse from '../../utils/api_response.js'
+import ApiResponse from '#utils/api_response'
 import UserPolicy from '#policies/user_policy'
-import { handleControllerError } from '../../utils/error_handler.js'
+import { handleControllerError } from '#utils/error_handler'
 
 export default class UpdateUserController {
   public async handle(ctx: HttpContext) {
