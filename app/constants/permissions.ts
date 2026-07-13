@@ -72,4 +72,20 @@ export const PERMISSIONS = {
     restoreOwn: 'branches.restore.own',
     restoreAny: 'branches.restore.any',
   },
+  products: {
+    view: 'products.view',
+    viewAny: 'products.view.any',
+    create: 'products.create',
+    update: 'products.update',
+    delete: 'products.delete',
+    restore: 'products.restore',
+  },
+  suppliers: {
+    view: 'suppliers.view',
+    viewAny: 'suppliers.view.any',
+    create: 'suppliers.create',
+    update: 'suppliers.update',
+    delete: 'suppliers.delete',
+    restore: 'suppliers.restore',
+  },
 } as const
