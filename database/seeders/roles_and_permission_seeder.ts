@@ -76,6 +76,10 @@ export default class RolesAndPermissionsSeeder extends BaseSeeder {
             PERMISSIONS.suppliers.update,
             PERMISSIONS.suppliers.delete,
             PERMISSIONS.suppliers.restore,
+            PERMISSIONS.inventory.view,
+            PERMISSIONS.inventory.viewAny,
+            PERMISSIONS.inventory.adjustAny,
+            PERMISSIONS.inventory.transferAny,
           ],
           permByName
         )
@@ -121,6 +125,9 @@ export default class RolesAndPermissionsSeeder extends BaseSeeder {
           PERMISSIONS.appointments.updateOwn,
           PERMISSIONS.products.view,
           PERMISSIONS.suppliers.view,
+          PERMISSIONS.inventory.view,
+          PERMISSIONS.inventory.adjustOwn,
+          PERMISSIONS.inventory.transferOwn,
         ],
         permByName
       )

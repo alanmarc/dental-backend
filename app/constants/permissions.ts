@@ -88,4 +88,12 @@ export const PERMISSIONS = {
     delete: 'suppliers.delete',
     restore: 'suppliers.restore',
   },
+  inventory: {
+    view: 'inventory.view',
+    viewAny: 'inventory.view.any',
+    adjustOwn: 'inventory.adjust.own',
+    adjustAny: 'inventory.adjust.any',
+    transferOwn: 'inventory.transfer.own',
+    transferAny: 'inventory.transfer.any',
+  },
 } as const
