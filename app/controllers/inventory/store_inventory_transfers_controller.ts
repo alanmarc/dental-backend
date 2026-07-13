@@ -54,8 +54,12 @@ export default class StoreInventoryTransfersController {
         return ApiResponse.error(ctx, 'Producto no encontrado', 422)
       }
 
-      if (product.hospitalId !== actor.branch.hospitalId) {
-        return ApiResponse.error(ctx, 'El producto no pertenece a tu hospital', 422)
+      if (product.hospitalId !== fromBranch.hospitalId) {
+        return ApiResponse.error(
+          ctx,
+          'El producto no pertenece al mismo hospital que las sucursales del traspaso',
+          422
+        )
       }
 
       const trx = await db.transaction()

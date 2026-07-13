@@ -4,7 +4,6 @@ import ApiResponse from '#utils/api_response'
 import InventoryPolicy from '#policies/inventory_policy'
 import Product from '#models/product'
 import Branch from '#models/branch'
-import Inventory from '#models/inventory'
 import { registerMovement } from '#services/inventory_service'
 import { adjustInventoryValidator } from '#validators/inventory/adjust_inventory_validator'
 import { handleControllerError } from '#utils/error_handler'
@@ -50,7 +49,7 @@ export default class AdjustInventoryController {
       const trx = await db.transaction()
       try {
         const type = direction === 'in' ? 'adjustment_in' : 'adjustment_out'
-        const movement = await registerMovement({
+        const { movement, inventory } = await registerMovement({
           branchId,
           productId,
           type,
@@ -60,12 +59,6 @@ export default class AdjustInventoryController {
           notes,
           trx,
         })
-
-        // Fetch the updated balance
-        const inventory = await Inventory.query({ client: trx })
-          .where('branch_id', branchId)
-          .where('product_id', productId)
-          .firstOrFail()
 
         await trx.commit()
 

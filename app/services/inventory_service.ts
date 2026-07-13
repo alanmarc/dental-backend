@@ -28,7 +28,7 @@ export async function registerMovement(params: {
   prescriptionItemId?: number
   notes?: string
   trx: TransactionClientContract
-}): Promise<InventoryMovement> {
+}): Promise<{ movement: InventoryMovement; inventory: Inventory }> {
   const {
     branchId,
     productId,
@@ -104,5 +104,5 @@ export async function registerMovement(params: {
     { client: trx }
   )
 
-  return movement
+  return { movement, inventory }
 }

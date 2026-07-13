@@ -22,7 +22,7 @@ test.group('InventoryService', (group) => {
     const trx = await db.transaction()
 
     try {
-      const movement = await registerMovement({
+      const { movement, inventory: updatedInventory } = await registerMovement({
         branchId: branch.id,
         productId: product.id,
         type: 'adjustment_in',
@@ -40,6 +40,7 @@ test.group('InventoryService', (group) => {
         .firstOrFail()
 
       assert.equal(inventory.quantity, 10)
+      assert.equal(updatedInventory.quantity, 10)
       assert.equal(movement.quantity, 10)
       assert.equal(movement.type, 'adjustment_in')
     } catch (err) {

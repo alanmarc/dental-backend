@@ -69,7 +69,7 @@ export default class ReturnPurchasesController {
       const movements: any[] = []
       try {
         for (const item of itemsToReturn) {
-          const movement = await registerMovement({
+          const { movement } = await registerMovement({
             branchId: purchase.branchId,
             productId: item.productId,
             type: 'purchase_return',

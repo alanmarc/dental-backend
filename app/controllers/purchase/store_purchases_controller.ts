@@ -35,8 +35,11 @@ export default class StorePurchasesController {
       if (!actor.hasPermission('purchases.create.any') && data.branchId !== actor.branchId) {
         return ApiResponse.error(ctx, 'No puedes crear compras para otra sucursal', 422)
       }
-      for (const item of data.items) {
-        const product = await Product.findOrFail(item.productId)
+      const products = await Promise.all(
+        data.items.map((item) => Product.findOrFail(item.productId))
+      )
+
+      for (const product of products) {
         if (product.hospitalId !== branch.hospitalId) {
           return ApiResponse.error(
             ctx,
