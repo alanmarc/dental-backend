@@ -18,18 +18,24 @@ export default class AdjustInventoryController {
       const data = await ctx.request.validateUsing(adjustInventoryValidator)
       const { productId, branchId, quantity, direction, notes } = data
 
-      // 1. Scoping check: own branch only if no adjust.any permission
+      if (!actor.branch) await actor.load('branch')
+
+      const branch = await Branch.query().where('id', branchId).whereNull('deleted_at').first()
+      if (!branch) {
+        return ApiResponse.error(ctx, 'Sucursal no encontrada', 422)
+      }
+
+      if (branch.hospitalId !== actor.branch.hospitalId) {
+        return ApiResponse.error(ctx, 'No puedes operar sobre una sucursal de otro hospital', 422)
+      }
+
       if (!actor.hasPermission('inventory.adjust.any') && branchId !== actor.branchId) {
         return ApiResponse.error(ctx, 'No puedes ajustar inventario de otra sucursal', 422)
       }
 
-      // 2. Validate product and branch existence and same hospital
       const product = await Product.query().where('id', productId).whereNull('deleted_at').first()
-
-      const branch = await Branch.query().where('id', branchId).whereNull('deleted_at').first()
-
-      if (!product || !branch) {
-        return ApiResponse.error(ctx, 'Producto o sucursal no encontrados', 422)
+      if (!product) {
+        return ApiResponse.error(ctx, 'Producto no encontrado', 422)
       }
 
       if (product.hospitalId !== branch.hospitalId) {

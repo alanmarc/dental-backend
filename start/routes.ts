@@ -20,6 +20,7 @@ import prescriptions from '../routes/prescriptions.js'
 import products from '../routes/products.js'
 import suppliers from '../routes/suppliers.js'
 import inventory from '../routes/inventory.js'
+import purchases from '../routes/purchases.js'
 
 const { default: AllTokensController } = await import('#controllers/all_tokens_controller')
 const { default: AuthController } = await import('#controllers/auth_controller')
@@ -46,6 +47,7 @@ router
     router.group(products).as('products')
     router.group(suppliers).as('suppliers')
     router.group(inventory).as('inventory')
+    router.group(purchases).as('purchases')
   })
   .prefix('api')
   .as('api')

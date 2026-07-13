@@ -99,4 +99,24 @@ test.group('Inventory adjust', (group) => {
     response.assertStatus(422)
     response.assertTextIncludes('Stock insuficiente')
   })
+
+  test('422 si tiene adjustAny pero la sucursal pertenece a otro hospital', async ({ client }) => {
+    const hospitalA = await Hospital.create({ name: 'Hosp A' })
+    const hospitalB = await Hospital.create({ name: 'Hosp B' })
+    const ownBranch = await createBranch(hospitalA.id)
+    const otherBranch = await createBranch(hospitalB.id)
+    const actor = await createUserWithPermissions(['inventory.adjust.any'], ownBranch.id)
+
+    const product = await Product.create({ hospitalId: hospitalB.id, name: 'Prod' })
+
+    const response = await client.post('/api/inventory/adjust').loginAs(actor).json({
+      productId: product.id,
+      branchId: otherBranch.id,
+      quantity: 5,
+      direction: 'in',
+    })
+
+    response.assertStatus(422)
+    response.assertTextIncludes('No puedes operar sobre una sucursal de otro hospital')
+  })
 })

@@ -96,4 +96,14 @@ export const PERMISSIONS = {
     transferOwn: 'inventory.transfer.own',
     transferAny: 'inventory.transfer.any',
   },
+  purchases: {
+    view: 'purchases.view',
+    viewAny: 'purchases.view.any',
+    createOwn: 'purchases.create.own',
+    createAny: 'purchases.create.any',
+    receiveOwn: 'purchases.receive.own',
+    receiveAny: 'purchases.receive.any',
+    cancelOwn: 'purchases.cancel.own',
+    cancelAny: 'purchases.cancel.any',
+  },
 } as const

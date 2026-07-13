@@ -5,6 +5,7 @@ import Supplier from '#models/supplier'
 import Branch from '#models/branch'
 import User from '#models/user'
 import PurchaseItem from '#models/purchase_item'
+import InventoryMovement from '#models/inventory_movement'
 
 export default class Purchase extends BaseModel {
   @column({ isPrimary: true })
@@ -51,4 +52,7 @@ export default class Purchase extends BaseModel {
 
   @hasMany(() => PurchaseItem)
   declare items: HasMany<typeof PurchaseItem>
+
+  @hasMany(() => InventoryMovement)
+  declare movements: HasMany<typeof InventoryMovement>
 }
