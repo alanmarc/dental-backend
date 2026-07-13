@@ -11,22 +11,49 @@ export default class UserPolicy extends BasePolicy {
     return actor.hasPermission('users.create')
   }
 
-  async update(actor: User, _target: User): Promise<AuthorizerResponse> {
-    return actor.hasPermission('users.update')
+  async update(actor: User, target: User): Promise<AuthorizerResponse> {
+    if (!actor.hasPermission('users.update')) return false
+    if (!actor.branch) {
+      await actor.load('branch')
+    }
+    if (!target.branch) {
+      await target.load('branch')
+    }
+    return actor.branch.hospitalId === target.branch.hospitalId
   }
 
   async assignRole(actor: User, target: User): Promise<AuthorizerResponse> {
-    if (!actor.hasPermission('users.assign_role')) return false
     if (actor.id === target.id) return false
-    return true
+    if (!actor.hasPermission('users.assign_role')) return false
+    if (!actor.branch) {
+      await actor.load('branch')
+    }
+    if (!target.branch) {
+      await target.load('branch')
+    }
+    return actor.branch.hospitalId === target.branch.hospitalId
   }
 
   async delete(actor: User, target: User): Promise<AuthorizerResponse> {
     if (actor.id === target.id) return false
-    return actor.hasPermission('users.delete')
+    if (!actor.hasPermission('users.delete')) return false
+    if (!actor.branch) {
+      await actor.load('branch')
+    }
+    if (!target.branch) {
+      await target.load('branch')
+    }
+    return actor.branch.hospitalId === target.branch.hospitalId
   }
 
-  async restore(actor: User): Promise<AuthorizerResponse> {
-    return actor.hasPermission('users.restore')
+  async restore(actor: User, target: User): Promise<AuthorizerResponse> {
+    if (!actor.hasPermission('users.restore')) return false
+    if (!actor.branch) {
+      await actor.load('branch')
+    }
+    if (!target.branch) {
+      await target.load('branch')
+    }
+    return actor.branch.hospitalId === target.branch.hospitalId
   }
 }

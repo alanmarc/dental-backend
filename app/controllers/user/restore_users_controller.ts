@@ -7,7 +7,7 @@ import { handleControllerError } from '#utils/error_handler'
 export default class RestoreUsersController {
   public async handle(ctx: HttpContext) {
     try {
-      const target = await User.findOrFail(ctx.params.id)
+      const target = await User.query().where('id', ctx.params.id).preload('branch').firstOrFail()
 
       await ctx.bouncer.with(UserPolicy).authorize('delete', target)
 
