@@ -14,11 +14,20 @@ export default class extends BaseSchema {
         .references('id')
         .inTable('users')
         .onDelete('RESTRICT')
+      table
+        .integer('product_id')
+        .unsigned()
+        .nullable()
+        .references('id')
+        .inTable('products')
+        .onDelete('RESTRICT')
     })
   }
 
   async down() {
     this.schema.alterTable(this.tableName, (table) => {
+      table.dropForeign(['product_id'])
+      table.dropColumn('product_id')
       table.dropForeign(['dispensed_by'])
       table.dropColumn('dispensed_by')
       table.dropColumn('dispensed_at')

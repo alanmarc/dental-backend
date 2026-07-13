@@ -11,6 +11,10 @@ const { default: SoftDeletePrescriptionsController } =
   await import('#controllers/prescription/soft_delete_prescriptions_controller')
 const { default: RestorePrescriptionsController } =
   await import('#controllers/prescription/restore_prescriptions_controller')
+const { default: DispensePrescriptionItemController } =
+  await import('#controllers/prescription/dispense_prescription_item_controller')
+const { default: DeclinePrescriptionItemController } =
+  await import('#controllers/prescription/decline_prescription_item_controller')
 
 const prescriptions = (): void => {
   router
@@ -20,6 +24,12 @@ const prescriptions = (): void => {
       router.put('/:id', [UpdatePrescriptionsController]).as('update')
       router.delete('/:id', [SoftDeletePrescriptionsController]).as('delete')
       router.put('/:id/restore', [RestorePrescriptionsController]).as('restore')
+      router
+        .put('/:id/items/:itemId/dispense', [DispensePrescriptionItemController])
+        .as('items.dispense')
+      router
+        .put('/:id/items/:itemId/decline', [DeclinePrescriptionItemController])
+        .as('items.decline')
     })
     .prefix('/prescriptions')
     .use([middleware.auth(), middleware.loadPermissions()])

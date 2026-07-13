@@ -3,6 +3,7 @@ import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Prescription from '#models/prescription'
 import User from '#models/user'
+import Product from '#models/product'
 
 export default class PrescriptionItem extends BaseModel {
   @column({ isPrimary: true })
@@ -35,6 +36,9 @@ export default class PrescriptionItem extends BaseModel {
   @column()
   declare dispensedBy: number | null
 
+  @column()
+  declare productId: number | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -46,4 +50,7 @@ export default class PrescriptionItem extends BaseModel {
 
   @belongsTo(() => User, { foreignKey: 'dispensedBy' })
   declare dispenser: BelongsTo<typeof User>
+
+  @belongsTo(() => Product)
+  declare product: BelongsTo<typeof Product>
 }

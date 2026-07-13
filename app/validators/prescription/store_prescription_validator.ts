@@ -41,6 +41,17 @@ export const storePrescriptionValidator = vine.compile(
     items: vine
       .array(
         vine.object({
+          productId: vine
+            .number()
+            .exists(async (db, value) => {
+              const product = await db
+                .from('products')
+                .where('id', value)
+                .whereNull('deleted_at')
+                .first()
+              return !!product
+            })
+            .optional(),
           medicationName: vine.string().minLength(1),
           dosage: vine.string().minLength(1),
           frequency: vine.string().minLength(1),

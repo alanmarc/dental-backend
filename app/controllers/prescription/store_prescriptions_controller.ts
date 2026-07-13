@@ -9,6 +9,7 @@ import Appointment from '#models/appointment'
 import MedicalHistory from '#models/medical_history'
 import Prescription from '#models/prescription'
 import PrescriptionItem from '#models/prescription_item'
+import Product from '#models/product'
 import db from '@adonisjs/lucid/services/db'
 
 export default class StorePrescriptionsController {
@@ -53,6 +54,21 @@ export default class StorePrescriptionsController {
         }
       }
 
+      // Check hospital alignment for any provided products
+      for (const item of data.items) {
+        if (item.productId) {
+          const product = await Product.findOrFail(item.productId)
+          if (!doctor.branch) await doctor.load('branch')
+          if (product.hospitalId !== doctor.branch.hospitalId) {
+            return ApiResponse.error(
+              ctx,
+              `El producto ${product.name} no pertenece al mismo hospital que el médico`,
+              422
+            )
+          }
+        }
+      }
+
       const trx = await db.transaction()
       try {
         const prescription = new Prescription()
@@ -74,6 +90,7 @@ export default class StorePrescriptionsController {
           prescriptionItem.frequency = item.frequency
           prescriptionItem.durationDays = item.durationDays
           prescriptionItem.instructions = item.instructions || null
+          prescriptionItem.productId = item.productId || null
 
           prescriptionItem.useTransaction(trx)
           await prescriptionItem.save()

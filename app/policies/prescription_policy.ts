@@ -1,6 +1,7 @@
 import { BasePolicy } from '@adonisjs/bouncer'
 import User from '#models/user'
 import Prescription from '#models/prescription'
+import PrescriptionItem from '#models/prescription_item'
 import { AuthorizerResponse } from '@adonisjs/bouncer/types'
 
 export default class PrescriptionPolicy extends BasePolicy {
@@ -47,6 +48,24 @@ export default class PrescriptionPolicy extends BasePolicy {
     }
     if (actor.hasPermission('prescriptions.restore.own')) {
       return prescription.userId === actor.id
+    }
+    return false
+  }
+
+  /**
+   * NOTE: Unlike standard own/any rules checking doctor ownership (userId === actor.id),
+   * dispensing is scoped by sucursal (branch) or hospital.
+   */
+  async dispense(actor: User, item: PrescriptionItem): Promise<AuthorizerResponse> {
+    if (!item.prescription) {
+      await item.load('prescription', (q) => q.preload('branch'))
+    }
+    if (actor.hasPermission('prescriptions.dispense.any')) {
+      if (!actor.branch) await actor.load('branch')
+      return actor.branch.hospitalId === item.prescription.branch.hospitalId
+    }
+    if (actor.hasPermission('prescriptions.dispense.own')) {
+      return actor.branchId === item.prescription.branchId
     }
     return false
   }

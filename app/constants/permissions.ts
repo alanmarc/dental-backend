@@ -52,6 +52,8 @@ export const PERMISSIONS = {
     deleteAny: 'prescriptions.delete.any',
     restoreOwn: 'prescriptions.restore.own',
     restoreAny: 'prescriptions.restore.any',
+    dispenseOwn: 'prescriptions.dispense.own',
+    dispenseAny: 'prescriptions.dispense.any',
   },
   hospitals: {
     view: 'hospitals.view',
