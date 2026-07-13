@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import InventoryMovement from '#models/inventory_movement'
 import Product from '#models/product'
 import Branch from '#models/branch'
 import User from '#models/user'
@@ -47,4 +48,7 @@ export default class InventoryTransfer extends BaseModel {
 
   @belongsTo(() => User, { foreignKey: 'requestedBy' })
   declare requester: BelongsTo<typeof User>
+
+  @hasMany(() => InventoryMovement, { foreignKey: 'transferId' })
+  declare movements: HasMany<typeof InventoryMovement>
 }

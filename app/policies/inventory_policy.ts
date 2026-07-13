@@ -12,4 +12,10 @@ export default class InventoryPolicy extends BasePolicy {
       actor.hasPermission('inventory.adjust.own') || actor.hasPermission('inventory.adjust.any')
     )
   }
+
+  async transfer(actor: User): Promise<AuthorizerResponse> {
+    return (
+      actor.hasPermission('inventory.transfer.own') || actor.hasPermission('inventory.transfer.any')
+    )
+  }
 }
