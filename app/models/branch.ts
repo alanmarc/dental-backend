@@ -5,6 +5,7 @@ import User from './user.js'
 import Patient from './patient.js'
 import Appointment from './appointment.js'
 import Hospital from './hospital.js'
+import Inventory from '#models/inventory'
 
 export default class Branch extends BaseModel {
   @column({ isPrimary: true })
@@ -46,4 +47,7 @@ export default class Branch extends BaseModel {
 
   @hasMany(() => Appointment)
   declare appointments: HasMany<typeof Appointment>
+
+  @hasMany(() => Inventory)
+  declare inventories: HasMany<typeof Inventory>
 }

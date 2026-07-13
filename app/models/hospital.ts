@@ -2,6 +2,8 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import Branch from './branch.js'
+import Product from '#models/product'
+import Supplier from '#models/supplier'
 
 export default class Hospital extends BaseModel {
   @column({ isPrimary: true })
@@ -22,4 +24,10 @@ export default class Hospital extends BaseModel {
   //Relacion de un hospital a muchas sucursales
   @hasMany(() => Branch)
   declare branches: HasMany<typeof Branch>
+
+  @hasMany(() => Product)
+  declare products: HasMany<typeof Product>
+
+  @hasMany(() => Supplier)
+  declare suppliers: HasMany<typeof Supplier>
 }

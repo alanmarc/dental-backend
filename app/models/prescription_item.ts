@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Prescription from '#models/prescription'
+import User from '#models/user'
 
 export default class PrescriptionItem extends BaseModel {
   @column({ isPrimary: true })
@@ -25,6 +26,15 @@ export default class PrescriptionItem extends BaseModel {
   @column()
   declare instructions: string | null
 
+  @column()
+  declare status: 'pending' | 'dispensed' | 'declined'
+
+  @column.dateTime()
+  declare dispensedAt: DateTime | null
+
+  @column()
+  declare dispensedBy: number | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -33,4 +43,7 @@ export default class PrescriptionItem extends BaseModel {
 
   @belongsTo(() => Prescription)
   declare prescription: BelongsTo<typeof Prescription>
+
+  @belongsTo(() => User, { foreignKey: 'dispensedBy' })
+  declare dispenser: BelongsTo<typeof User>
 }
